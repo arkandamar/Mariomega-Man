@@ -1,0 +1,15 @@
+Window width=720 height=480 fullscreen=0 frame=60
+
+Font name=Mario path=assets/fonts/mario.ttf
+Font name=Megaman path=assets/fonts/megaman.ttf
+
+Texture name=TexBlock path=assets/overworld_block.png
+Texture name=TexCloud path=assets/clouds.png
+Texture name=TexBlockCoin path=assets/block_coin.png
+Texture name=TexCoinArise path=assets/coin_arise.png
+Texture name=TexMegaman path=assets/megaman.png
+Texture name=TexMegamanShoot path=assets/megaman_shoot.png
+
+Player radius=32 coll_radius=32 speed=5 fill_rgb(50,5,5) out_rgb(255,0,0) thick=4 vert=8 special_weapon_cooldown=300
+Enemy radius=32 coll_radius=32 speed_min=3 speed_max=4 out_rgb(255,255,255) thick=2 vert_min=3 vert_max=8 lifespan=90 spawn_rate=60
+Bullet radius=10 coll_radius=10 speed=20 fill_rgb(255,255,255) out_rgb(255,255,255) thick=2 vert=20 lifespan=90
