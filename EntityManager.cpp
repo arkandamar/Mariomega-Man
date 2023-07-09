@@ -4,8 +4,6 @@
 
 #include <iostream>
 
-enum class EntityVectors { Player, Enemies, SmallEnemies, Bullets };
-
 EntityManager::EntityManager() {};
 
 void EntityManager::init() {}

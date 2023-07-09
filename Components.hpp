@@ -1,10 +1,15 @@
 #pragma once
 
 #include "Vec2.hpp"
+#include "Animation.hpp"
 
 #include <SFML/Graphics.hpp>
 
-class Component {};
+class Component 
+{
+public:
+	bool has = false;
+};
 
 class CTransform : public Component
 {
@@ -15,7 +20,8 @@ public:
 	Vec2 scale = { 0.0, 0.0 };
 	float angle = 0;
 
-	CTransform(const Vec2& p, const Vec2& v, float a);
+	CTransform();
+	CTransform(const Vec2& p);
 };
 
 class CShape : public Component
@@ -62,20 +68,31 @@ public:
 
 class CAnimation : public Component
 {
-
+public:
+	Animation animation;
+	bool isLoop;
+	CAnimation(Animation animation, bool loop);
 };
 
 class CGravity : public Component
 {
-
+public:
+	size_t accel;
+	CGravity(size_t accel);
 };
 
 class CState : public Component
 {
-
+public:
+	bool onGround;
+	bool inAir;
+	CState(bool groundState, bool airState);
 };
 
 class CBoundingBox : public Component
 {
-
+public:
+	Vec2 size;
+	Vec2 halfSize;
+	CBoundingBox(Vec2 size);
 };

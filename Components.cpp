@@ -2,7 +2,8 @@
 
 #include "Components.hpp"
 
-CTransform::CTransform(const Vec2& p, const Vec2& v, float a) : pos(p), velocity(v), angle(a) {};
+CTransform::CTransform() {};
+CTransform::CTransform(const Vec2& p) : pos(p) {};
 
 CShape::CShape(float radius, int points, const sf::Color& fill
 	, const sf::Color& outline, float thickness)
@@ -21,3 +22,12 @@ CScore::CScore(int s) : score(s) {};
 CLifespan::CLifespan(int total) : remaining(total), total(total) {};
 
 CInput::CInput() {};
+
+CAnimation::CAnimation(Animation animation, bool loop) : animation(animation), isLoop(loop) {};
+
+CGravity::CGravity(size_t accel) : accel(accel) {};
+
+CState::CState(bool groundState, bool airState) : onGround(groundState), inAir(airState) {};
+
+CBoundingBox::CBoundingBox(Vec2 size) : size(size), halfSize(size / 2.0f) {};
+
