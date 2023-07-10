@@ -139,6 +139,9 @@
     <ClCompile Include="EntityManager.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Physics.cpp" />
+    <ClCompile Include="Scene.cpp" />
+    <ClCompile Include="Scene_Menu.cpp" />
+    <ClCompile Include="Scene_Play.cpp" />
     <ClCompile Include="Vec2.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -149,6 +152,9 @@
     <ClInclude Include="Entity.hpp" />
     <ClInclude Include="EntityManager.hpp" />
     <ClInclude Include="Physics.hpp" />
+    <ClInclude Include="Scene.hpp" />
+    <ClInclude Include="Scene_Menu.hpp" />
+    <ClInclude Include="Scene_Play.hpp" />
     <ClInclude Include="Vec2.hpp" />
   </ItemGroup>
   <ItemGroup>
