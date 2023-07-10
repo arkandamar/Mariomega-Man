@@ -15,19 +15,26 @@ CShape::CShape(float radius, int points, const sf::Color& fill
 	circle.setOrigin(radius, radius);
 };
 
+CCollision::CCollision() : radius(0.0f) {};
 CCollision::CCollision(float rad) : radius(rad) {};
 
+CScore::CScore() : score(0) {};
 CScore::CScore(int s) : score(s) {};
 
+CLifespan::CLifespan() : remaining(0), total(0) {};
 CLifespan::CLifespan(int total) : remaining(total), total(total) {};
 
 CInput::CInput() {};
 
+CAnimation::CAnimation() : animation(Animation()), isLoop(false) {};
 CAnimation::CAnimation(Animation animation, bool loop) : animation(animation), isLoop(loop) {};
 
+CGravity::CGravity() : accel() {};
 CGravity::CGravity(size_t accel) : accel(accel) {};
 
-CState::CState(bool groundState, bool airState) : onGround(groundState), inAir(airState) {};
+CState::CState() : onGround(true) {};
+CState::CState(bool groundState) : onGround(groundState) {};
 
+CBoundingBox::CBoundingBox() : size(Vec2(0.0f, 0.0f)), halfSize(Vec2(0.0f, 0.0f)) {}
 CBoundingBox::CBoundingBox(Vec2 size) : size(size), halfSize(size / 2.0f) {};
 

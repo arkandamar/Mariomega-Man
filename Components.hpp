@@ -14,10 +14,10 @@ public:
 class CTransform : public Component
 {
 public:
-	Vec2 pos = { 0.0, 0.0 };
-	Vec2 prevPos = { 0.0, 0.0 };
-	Vec2 velocity = { 0.0, 0.0 };
-	Vec2 scale = { 0.0, 0.0 };
+	Vec2 pos = { 0.0f, 0.0f };
+	Vec2 prevPos = { 0.0f, 0.0f };
+	Vec2 velocity = { 0.0f, 0.0f };
+	Vec2 scale = { 0.0f, 0.0f };
 	float angle = 0;
 
 	CTransform();
@@ -28,6 +28,8 @@ class CShape : public Component
 {
 public:
 	sf::CircleShape circle;
+
+	CShape();
 	CShape(float radius, int points, const sf::Color& fill, const sf::Color& outline, float thickness);
 };
 
@@ -35,6 +37,8 @@ class CCollision : public Component
 {
 public:
 	float radius = 0;
+
+	CCollision();
 	CCollision(float rad);
 };
 
@@ -43,6 +47,8 @@ class CScore : public Component
 
 public:
 	int score = 0;
+
+	CScore();
 	CScore(int s);
 };
 
@@ -51,6 +57,8 @@ class CLifespan : public Component
 public:
 	int remaining = 0; // remaining amount of lifespan
 	int total = 0; // total inital amount of lifespan
+
+	CLifespan();
 	CLifespan(int total);
 };
 
@@ -70,29 +78,36 @@ class CAnimation : public Component
 {
 public:
 	Animation animation;
-	bool isLoop;
+	bool isLoop = false;
+
+	CAnimation();
 	CAnimation(Animation animation, bool loop);
 };
 
 class CGravity : public Component
 {
 public:
-	size_t accel;
+	size_t accel = 0;
+
+	CGravity();
 	CGravity(size_t accel);
 };
 
 class CState : public Component
 {
 public:
-	bool onGround;
-	bool inAir;
-	CState(bool groundState, bool airState);
+	bool onGround = true;
+
+	CState();
+	CState(bool groundState);
 };
 
 class CBoundingBox : public Component
 {
 public:
-	Vec2 size;
-	Vec2 halfSize;
+	Vec2 size = { 0.0f, 0.0f };
+	Vec2 halfSize = { 0.0f, 0.0f };
+
+	CBoundingBox();
 	CBoundingBox(Vec2 size);
 };

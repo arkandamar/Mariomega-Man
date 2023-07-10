@@ -2,8 +2,6 @@
 
 #include "EntityManager.hpp"
 
-#include <iostream>
-
 EntityManager::EntityManager() {};
 
 void EntityManager::init() {}

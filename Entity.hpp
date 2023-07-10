@@ -3,19 +3,34 @@
 #include "Components.hpp"
 
 #include <memory>
+#include <tuple>
+#include <optional>
 
-enum Tag { Player, Enemy, Tile, Dec, TAG_COUNT = Dec + 1 };
+class EntityManager;
+
+typedef std::tuple<
+	CTransform,
+	CLifespan,
+	CInput,
+	CBoundingBox,
+	CAnimation,
+	CGravity,
+	CState
+> ComponentTuple;
+
+enum Tag { DefaultTag = -1, Player, Enemy, Tile, Dec, TAG_COUNT = Dec + 1 };
 
 class Entity
 {
-	size_t m_id = 0;
-	Tag m_tag;
-	bool m_active = true;
-
 	// make constructor private so entity cannot be created directly
-	Entity(const Tag tag, size_t id);
-
 	friend class EntityManager;
+
+	size_t m_id = 0;
+	Tag m_tag = DefaultTag;
+	bool m_active = true;
+	ComponentTuple m_components;
+
+	Entity(const Tag tag, size_t id);
 
 public:
 	// private member access
@@ -24,11 +39,19 @@ public:
 	const Tag getTag() const;
 	const size_t getId() const;
 
-	// component pointers
-	std::shared_ptr<CTransform> cTransform;
-	std::shared_ptr<CShape> cShape;
-	std::shared_ptr<CCollision> cCollision;
-	std::shared_ptr<CScore> cScore;
-	std::shared_ptr<CLifespan> cLifespan;
-	std::shared_ptr<CInput> cInput;
+	// component function
+	template <typename T>
+	T& getComponent();
+
+	template<typename T>
+	const T& getComponent() const;
+
+	template<typename T>
+	bool hasComponent() const;
+
+	template<typename T, typename... TArgs>
+	T& addComponent(TArgs&&... mArgs);
+
+	template<typename T>
+	void removeComponent();
 };
