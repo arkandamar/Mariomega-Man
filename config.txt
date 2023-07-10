@@ -1,5 +1,6 @@
 Window width=720 height=480 fullscreen=0 frame=60
 
+Font name=Arial path=assets/fonts/arial.ttf
 Font name=Mario path=assets/fonts/mario.ttf
 Font name=Megaman path=assets/fonts/megaman.ttf
 

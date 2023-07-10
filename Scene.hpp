@@ -5,6 +5,8 @@
 
 class GameEngine;
 
+enum EnumScene { Default = -1, MenuScene, PlayScene, SCENE_COUNT = PlayScene + 1 };
+
 typedef std::map<int, EnumAction> ActionMap;
 
 class Scene
