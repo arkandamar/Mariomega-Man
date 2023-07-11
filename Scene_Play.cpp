@@ -10,11 +10,15 @@ Scene_Play::Scene_Play(GameEngine* gameEngine, const std::string& levelPath)
 
 void Scene_Play::init()
 {
+	// register all game action in menu
 	registerAction(sf::Keyboard::W, Jump);
 	registerAction(sf::Keyboard::D, Right);
 	registerAction(sf::Keyboard::A, Left);
 	registerAction(sf::Keyboard::Space, Shoot);
 
+	m_gridText.setCharacterSize(12);
+
+	// load level config
 	loadLevel(m_levelPath);
 }
 

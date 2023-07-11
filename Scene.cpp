@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Scene.hpp"
+#include "GameEngine.hpp"
 
 // private member function
 void Scene::setPaused(bool paused)
@@ -27,13 +28,13 @@ void Scene::registerAction(int inputKey, EnumAction actionName)
 size_t Scene::width() const
 {
 	// return window width
-	return 0;
+	return m_game->window().getSize().x;
 }
 
 size_t Scene::height() const
 {
 	// return window height
-	return 0;
+	return m_game->window().getSize().y;
 }
 
 size_t Scene::currentFrame() const

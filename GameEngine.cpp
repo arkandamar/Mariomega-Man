@@ -102,6 +102,7 @@ void GameEngine::run()
 	while (isRunning())
 	{
 		sUserInput();
+		update();
 	}
 }
 
@@ -132,7 +133,7 @@ void GameEngine::sUserInput()
 // updating previous game state 
 void GameEngine::update()
 {
-
+	currentScene()->update();
 }
 
 std::shared_ptr<Scene> GameEngine::currentScene()
@@ -155,6 +156,11 @@ void GameEngine::quit()
 sf::RenderWindow& GameEngine::window()
 {
 	return m_window;
+}
+
+Assets& GameEngine::assets()
+{
+	return m_assets;
 }
 
 const Assets& GameEngine::assets() const

@@ -33,6 +33,7 @@ public:
 	void run();
 
 	sf::RenderWindow& window();
+	Assets& assets();
 	const Assets& assets() const;
 	bool isRunning();
 };

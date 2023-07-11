@@ -4,9 +4,8 @@
 int main(int argc, char* argv[])
 {
 	GameEngine game("config.txt");
-	game.run();
-
 	game.changeScene(MenuScene, std::make_shared<Scene_Menu>(&game), true);
+	game.run();
 
 	return 0;
 }
