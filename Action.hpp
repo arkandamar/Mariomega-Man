@@ -1,6 +1,6 @@
 #pragma once
 
-enum EnumAction { UknownAction = -1, Back, Right, Left, Up, Down, Jump, Shoot, Play, ACTION_SIZE = Play + 1 };
+enum EnumAction { UknownAction = -1, Back, Right, Left, Up, Down, Jump, Shoot, ShowTexture, ShowGrid, ShowCollision, Play, ACTION_SIZE = Play + 1 };
 enum EnumKeyType { UnknownType = -1, KeyPress, KeyRelease, TYPE_SIZE = KeyRelease + 1 };
 
 class Action

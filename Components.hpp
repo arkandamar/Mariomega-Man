@@ -78,10 +78,10 @@ class CAnimation : public Component
 {
 public:
 	Animation animation;
-	bool isLoop = false;
+	bool repeat = false;
 
 	CAnimation();
-	CAnimation(Animation animation, bool loop);
+	CAnimation(const Animation& animation, bool repeat);
 };
 
 class CGravity : public Component

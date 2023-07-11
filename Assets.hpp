@@ -6,7 +6,7 @@
 #include <SFML/Audio.hpp>
 
 enum EnumTexture { TexMegaman, TexMegamanShoot, TexPipeScenery, TexCoinArise, TexCoinObtain, TexBlockCoin, TextCloud, TexBlock, TEX_COUNT = TexBlock + 1 };
-enum EnumFont { FontMario, FontMegaman, FONT_COUNT = FontMegaman + 1 };
+enum EnumFont { FontMario, FontRoboto, FontMegaman, FONT_COUNT = FontMegaman + 1 };
 enum EnumSound { DeathSound, SOUND_COUNT = DeathSound + 1 };
 
 class Assets

@@ -18,6 +18,7 @@ protected:
 	bool m_drawBoundingBox = false;
 	bool m_drawGrid = false;
 	sf::Text m_gridText;
+	Vec2 m_gridSize = { 64, 64 };
 
 	void loadLevel(const std::string& filename);
 	void init();

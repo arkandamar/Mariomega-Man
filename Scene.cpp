@@ -55,4 +55,10 @@ const ActionMap& Scene::getActionMap() const
 void Scene::drawLine(const Vec2& p1, const Vec2& p2)
 {
 	// draw gird line
+	sf::Vertex line[2];
+	line[0].position = sf::Vector2f(p1.x, p1.y);
+	line[0].color = sf::Color::White;
+	line[1].position = sf::Vector2f(p2.x, p2.y);
+	line[1].color = sf::Color::White;
+	m_game->window().draw(line, 2, sf::Lines);
 }

@@ -9,7 +9,10 @@
 using std::cout;
 using std::endl;
 
-static std::map<std::string, EnumFont> const fontTable = { {"Mario", EnumFont::FontMario}, {"Megaman", EnumFont::FontMegaman} };
+static std::map<std::string, EnumFont> const fontTable = 
+{ 
+	{"Mario", EnumFont::FontMario}, {"Megaman", EnumFont::FontMegaman}, { "Roboto", EnumFont::FontRoboto }
+};
 static std::map<std::string, EnumTexture> const textureTable =
 {
 	{"TexBlock", EnumTexture::TexBlock}, {"TexCloud", EnumTexture::TextCloud}, {"TexBlockCoin", EnumTexture::TexBlockCoin},
