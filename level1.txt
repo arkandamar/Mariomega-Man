@@ -1,0 +1,3 @@
+Entity		Name		grid X	grid Y
+Tile		TexTile		0		0
+Tile		TexTile		1		0

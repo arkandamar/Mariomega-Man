@@ -98,5 +98,6 @@
   </ItemGroup>
   <ItemGroup>
     <Text Include="config.txt" />
+    <Text Include="level1.txt" />
   </ItemGroup>
 </Project>
