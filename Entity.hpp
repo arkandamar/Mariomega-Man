@@ -4,7 +4,6 @@
 
 #include <memory>
 #include <tuple>
-#include <optional>
 
 class EntityManager;
 
@@ -41,17 +40,37 @@ public:
 
 	// component function
 	template <typename T>
-	T& getComponent();
+	T& getComponent()
+	{
+		return std::get<T>(m_components);
+	}
 
 	template<typename T>
-	const T& getComponent() const;
+	const T& getComponent() const
+	{
+		return std::get<T>(m_components);
+	}
 
 	template<typename T>
-	bool hasComponent() const;
+	bool hasComponent() const
+	{
+		return getComponent<T>().has;
+	}
 
 	template<typename T, typename... TArgs>
-	T& addComponent(TArgs&&... mArgs);
+	T& addComponent(TArgs&&... mArgs)
+	{
+		auto& component = getComponent<T>();
+		component = T(std::forward<TArgs>(mArgs)...);
+		component.has = true;
+		return component;
+	}
 
 	template<typename T>
-	void removeComponent();
+	void removeComponent()
+	{
+		auto& component = getComponent<T>();
+		component = T();
+		component.has = false;
+	}
 };

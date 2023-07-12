@@ -15,9 +15,9 @@ Animation::Animation(EnumAnimation name, const sf::Texture& t, size_t frameCount
 }
 
 // setter
-void Animation::setIntRect(float x, float y)
+void Animation::setIntRect(int x, int y)
 {
-	m_sprite.setTextureRect(sf::IntRect(x, y, m_size.x, m_size.y));
+	m_sprite.setTextureRect(sf::IntRect(x, y, (int) m_size.x, (int) m_size.y));
 }
 
 // update the animation to show the next frame

@@ -2,7 +2,11 @@
 
 #include "EntityManager.hpp"
 
-EntityManager::EntityManager() {};
+EntityManager::EntityManager() : m_total_entities(0) 
+{
+	m_entities.clear();
+	m_toAdd.clear();
+};
 
 void EntityManager::init() {}
 

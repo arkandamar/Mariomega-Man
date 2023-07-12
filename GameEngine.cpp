@@ -147,7 +147,7 @@ void GameEngine::init(const std::string& path)
 	{
 		m_assets.registerAnimation(it->second, Vec2(16, 16));
 	}
-	m_assets.getAnimation(AniBlock).setIntRect(16, 16);
+	m_assets.getAnimation(AniBlock).setIntRect(18, 0);
 	m_assets.getAnimation(AniGround).setIntRect(0, 0);
 }
 

@@ -23,7 +23,7 @@ public:
 	Animation(EnumAnimation name, const sf::Texture& t, size_t frameCount, size_t duration, Vec2 size);
 
 	// setter
-	void setIntRect(float x, float y);
+	void setIntRect(int x, int y);
 
 	// getter
 	const Vec2& getSize() const;

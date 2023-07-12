@@ -45,7 +45,13 @@ void Scene_Play::loadLevel(const std::string& filename)
 	spawnPlayer();
 
 	// sample entities
+	auto ground = m_entityManager.addEntity(Tile);
+	ground->addComponent<CAnimation>(m_game->assets().getAnimation(AniGround), true);
+	ground->addComponent<CTransform>(Vec2(300, 300));
+
 	auto brick = m_entityManager.addEntity(Tile);
+	brick->addComponent<CAnimation>(m_game->assets().getAnimation(AniBlock), true);
+	brick->addComponent<CTransform>(Vec2(400, 300));
 }
 
 void Scene_Play::update()
@@ -102,6 +108,17 @@ void Scene_Play::sAnimation()
 void Scene_Play::sMovement()
 {
 	// movement system
+	for (auto& e : m_entityManager.getEntities())
+	{
+		if (e->hasComponent<CTransform>() && e->hasComponent<CAnimation>())
+		{
+			e->getComponent<CAnimation>().animation.getSprite().setPosition
+			(
+				e->getComponent<CTransform>().pos.x + e->getComponent<CTransform>().velocity.x,
+				e->getComponent<CTransform>().pos.y + e->getComponent<CTransform>().velocity.y
+			);
+		}
+	}
 }
 
 void Scene_Play::sRender()
@@ -113,7 +130,10 @@ void Scene_Play::sRender()
 	{
 		for (auto& e : m_entityManager.getEntities())
 		{
-			
+			if (e->hasComponent<CAnimation>())
+			{
+				m_game->window().draw(e->getComponent<CAnimation>().animation.getSprite());
+			}
 		}
 	}
 
@@ -151,6 +171,9 @@ void Scene_Play::sRender()
 void Scene_Play::spawnPlayer()
 {
 	// spawn player
+	auto p = m_entityManager.addEntity(Player);
+	p->addComponent<CInput>();
+	m_player = p;
 }
 
 void Scene_Play::spawnBullet(std::shared_ptr<Entity> entity)
