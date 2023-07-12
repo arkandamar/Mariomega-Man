@@ -4,7 +4,7 @@
 
 #include <SFML/Graphics.hpp>
 
-enum EnumAnimation { AniDefault = -1, AniWalk, AniBlockCoin, AniStand, ANI_COUNT = AniStand + 1 };
+enum EnumAnimation { AniDefault = -1, AniWalk, AniBlockCoin, AniGround, AniBlock, AniStand, ANI_COUNT = AniStand + 1 };
 
 class Animation
 {
@@ -12,7 +12,7 @@ class Animation
 	sf::Sprite m_sprite;
 	size_t m_frameCount = 0;
 	size_t m_currentFrame = 0;
-	size_t m_duration = 0;
+	size_t m_frameDuration = 0;
 	Vec2 m_size = Vec2(0.0f, 0.0f);
 
 	void update();
@@ -21,6 +21,9 @@ public:
 	Animation();
 	Animation(EnumAnimation name, const sf::Texture& t);
 	Animation(EnumAnimation name, const sf::Texture& t, size_t frameCount, size_t duration, Vec2 size);
+
+	// setter
+	void setIntRect(float x, float y);
 
 	// getter
 	const Vec2& getSize() const;

@@ -44,6 +44,26 @@ void Assets::addSound(EnumSound name, const std::string& path)
 	m_sounds[name] = sound;
 };
 
+void Assets::addAniType(EnumAnimation name, EnumTexture texture, int frameCount, int frameDuration)
+{
+	auto& aniType = m_aniType[name];
+	aniType.name = name;
+	aniType.texture = texture;
+	aniType.frameCount = frameCount;
+	aniType.frameDuration = frameDuration;
+}
+
+void Assets::registerAnimation(EnumAnimation name, Vec2 size)
+{
+	auto& type = m_aniType[name];
+	addAnimation(name, Animation(type.name, getTexture(type.texture), type.frameCount, type.frameDuration, size));
+}
+
+void Assets::registerAnimation(EnumAnimation name, EnumTexture texture, int frameCount, int duration, Vec2 size)
+{
+	addAnimation(name, Animation(name, getTexture(texture), frameCount, duration, size));
+}
+
 // getter
 sf::Texture& Assets::getTexture(EnumTexture name)
 {
@@ -63,4 +83,9 @@ sf::Font& Assets::getFont(EnumFont name)
 sf::Sound& Assets::getSound(EnumSound name)
 {
 	return m_sounds[name];
+}
+
+AniType& Assets::getAniType(EnumAnimation name)
+{
+	return m_aniType[name];
 }

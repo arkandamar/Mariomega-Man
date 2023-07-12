@@ -9,6 +9,7 @@
 using std::cout;
 using std::endl;
 
+// map the string value when reading config.txt to enum defining assets
 static std::map<std::string, EnumFont> const fontTable = 
 { 
 	{"Mario", EnumFont::FontMario}, {"Megaman", EnumFont::FontMegaman}, { "Roboto", EnumFont::FontRoboto }
@@ -18,6 +19,12 @@ static std::map<std::string, EnumTexture> const textureTable =
 	{"TexBlock", EnumTexture::TexBlock}, {"TexCloud", EnumTexture::TextCloud}, {"TexBlockCoin", EnumTexture::TexBlockCoin},
 	{"TexCoinObtain", EnumTexture::TexCoinObtain}, {"TexCoinArise", EnumTexture::TexCoinArise},
 	{"TexPipeScenery", EnumTexture::TexPipeScenery}, {"TexMegaman", EnumTexture::TexMegaman}, {"TexMegamanShoot", EnumTexture::TexMegamanShoot}
+};
+
+static std::map<std::string, EnumAnimation> const animTable =
+{
+	{"AniGround", EnumAnimation::AniGround}, {"AniBlock", EnumAnimation::AniBlock}, 
+	{"AniBlockCoin", EnumAnimation::AniBlockCoin},
 };
 
 GameEngine::GameEngine(const std::string& path)
@@ -76,6 +83,7 @@ void GameEngine::init(const std::string& path)
 			else {
 				// font found
 				m_assets.addFont(it->second, path);
+				cout << path << " loaded" << endl;
 			}
 		}
 
@@ -95,9 +103,52 @@ void GameEngine::init(const std::string& path)
 			else {
 				// font found
 				m_assets.addTexture(it->second, path);
+				cout << path << " loaded" << endl;
+			}
+		}
+
+		if (temp == "Animation")
+		{
+			fin >> temp;
+			std::string name = utils::extractValueStr(temp, "=");
+
+			fin >> temp;
+			std::string texture = utils::extractValueStr(temp, "=");
+
+			fin >> temp;
+			int frameCout = utils::extractValue(temp, "=");
+
+			fin >> temp;
+			int duration = utils::extractValue(temp, "=");
+
+			auto it = animTable.find(name);
+			if (it == animTable.end()) {
+				// ani not found
+				cout << name << " not found in system" << endl;
+			}
+			else {
+				// ani found
+				auto ut = textureTable.find(texture);
+				if (ut == textureTable.end())
+				{
+					// ani texture not found
+					cout << "cannot find texture associated with " << texture << endl;
+				}
+				else {
+					m_assets.addAniType(it->second, ut->second, frameCout, duration);
+					cout << name << " loaded" << endl;
+				}
 			}
 		}
 	}
+
+	// register animation to texture
+	for (auto it = animTable.begin(); it != animTable.end(); it++)
+	{
+		m_assets.registerAnimation(it->second, Vec2(16, 16));
+	}
+	m_assets.getAnimation(AniBlock).setIntRect(16, 16);
+	m_assets.getAnimation(AniGround).setIntRect(0, 0);
 }
 
 void GameEngine::run()

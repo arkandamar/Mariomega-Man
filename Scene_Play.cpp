@@ -25,7 +25,7 @@ void Scene_Play::init()
 	registerAction(sf::Keyboard::D, Right);
 	registerAction(sf::Keyboard::A, Left);
 	registerAction(sf::Keyboard::Space, Shoot);
-	registerAction(sf::Keyboard::Backspace, Back);
+	registerAction(sf::Keyboard::B, Back);
 
 	m_gridText.setCharacterSize(12);
 	m_gridText.setFont(m_game->assets().getFont(FontRoboto));
@@ -75,12 +75,11 @@ void Scene_Play::sDoAction(const Action& action)
 	{
 		switch (action.actionName())
 		{
-		case Back: onEnd(); break;
-		case ShowTexture: m_drawTextures = !m_drawTextures; break;
-		case ShowGrid: m_drawGrid = !m_drawGrid; break;
-		case ShowCollision: m_drawBoundingBox = !m_drawBoundingBox; break;
-		default:
-			break;
+			case Back: onEnd(); break;
+			case ShowTexture: m_drawTextures = !m_drawTextures; break;
+			case ShowGrid: m_drawGrid = !m_drawGrid; break;
+			case ShowCollision: m_drawBoundingBox = !m_drawBoundingBox; break;
+			default: break;
 		}
 	}
 }
@@ -109,6 +108,14 @@ void Scene_Play::sRender()
 {
 	// render system
 	m_game->window().clear(sf::Color(97, 133, 248));
+
+	if (m_drawTextures)
+	{
+		for (auto& e : m_entityManager.getEntities())
+		{
+			
+		}
+	}
 
 	if (m_drawGrid)
 	{

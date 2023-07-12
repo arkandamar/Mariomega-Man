@@ -8,10 +8,16 @@ Animation::Animation(EnumAnimation name, const sf::Texture& t)
 	: m_name(name), m_sprite(t) {}
 
 
-Animation::Animation(EnumAnimation name, const sf::Texture& t, size_t frameCount, size_t duration, Vec2 size)
-	: m_name(name), m_sprite(t), m_frameCount(frameCount), m_duration(duration), m_currentFrame(0), m_size(size)
+Animation::Animation(EnumAnimation name, const sf::Texture& t, size_t frameCount, size_t frameDuration, Vec2 size)
+	: m_name(name), m_sprite(t), m_frameCount(frameCount), m_frameDuration(frameDuration), m_currentFrame(0), m_size(size)
 {
 	m_sprite.setOrigin(m_size.x / 2.0f, m_size.y / 2.0f);
+}
+
+// setter
+void Animation::setIntRect(float x, float y)
+{
+	m_sprite.setTextureRect(sf::IntRect(x, y, m_size.x, m_size.y));
 }
 
 // update the animation to show the next frame
