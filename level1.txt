@@ -1,3 +1,6 @@
-Entity		Name		grid X	grid Y
-Tile		TexTile		0		0
-Tile		TexTile		1		0
+Entity		Name		FromX	FromY	toX		toY
+Tile		Ground		0		0		20		0
+Tile		Brick		2		3		10		3
+Tile		Brick		3		6		5		6
+Tile		Brick		7		6		9		6
+Tile		Brick		5		9		7		9

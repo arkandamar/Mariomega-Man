@@ -4,7 +4,7 @@
 
 #include <SFML/Graphics.hpp>
 
-enum EnumAnimation { AniDefault = -1, AniWalk, AniBlockCoin, AniGround, AniBlock, AniStand, ANI_COUNT = AniStand + 1 };
+enum EnumAnimation { AniDefault = -1, AniWalk, AniBlockCoin, AniGround, AniBrick, AniStand, ANI_COUNT = AniStand + 1 };
 
 class Animation
 {

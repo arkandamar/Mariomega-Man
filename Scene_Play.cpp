@@ -5,9 +5,15 @@
 #include "Scene_Menu.hpp"
 
 #include <iostream>
+#include <fstream>
 
 using std::cout;
 using std::endl;
+
+std::map<std::string, EnumAnimation> tableLevel =
+{
+	{"Ground", AniGround}, {"Brick", AniBrick}
+};
 
 Scene_Play::Scene_Play(GameEngine* gameEngine, const std::string& levelPath)
 	: Scene(gameEngine), m_levelPath(levelPath)
@@ -20,12 +26,12 @@ void Scene_Play::init()
 	// register all game action in menu
 	registerAction(sf::Keyboard::T, ShowTexture);
 	registerAction(sf::Keyboard::G, ShowGrid);
-	registerAction(sf::Keyboard::C, ShowCollision);
+	registerAction(sf::Keyboard::B, ShowCollision);
 	registerAction(sf::Keyboard::W, Jump);
 	registerAction(sf::Keyboard::D, Right);
 	registerAction(sf::Keyboard::A, Left);
 	registerAction(sf::Keyboard::Space, Shoot);
-	registerAction(sf::Keyboard::B, Back);
+	registerAction(sf::Keyboard::BackSpace, Back);
 
 	m_gridText.setCharacterSize(12);
 	m_gridText.setFont(m_game->assets().getFont(FontRoboto));
@@ -40,18 +46,111 @@ void Scene_Play::loadLevel(const std::string& filename)
 	m_entityManager = EntityManager();
 
 	// load level from level config file
+	std::ifstream fin(filename);
+	std::string temp;
 
-	// spawn player when file loaded
+	while (!fin.eof() && !fin.fail())
+	{
+		fin >> temp;
+		if (temp == "Tile")
+		{
+			fin >> temp;
+			std::string name = temp;
+
+			fin >> temp;
+			int fromX = std::stoi(temp);
+
+			fin >> temp;
+			int fromY = std::stoi(temp);
+
+			fin >> temp;
+			int toX = std::stoi(temp);
+
+			fin >> temp;
+			int toY = std::stoi(temp);
+
+			auto it = tableLevel.find(name);
+			if (it == tableLevel.end()) {
+				// name not found
+				cout << name << " not found in system" << endl;
+			}
+			else {
+				// name found
+				if (!((fromX & fromY & toX & toY) >= 0))
+				{
+					cout << "invalid coordinat, do not use negative value!" << endl;
+				}
+				else
+				{
+					for (int i = fromX; i <= toX; i++)
+					{
+						for (int j = fromY; j <= toY; j++)
+						{
+							auto tile = m_entityManager.addEntity(Tile);
+							tile->addComponent<CAnimation>(m_game->assets().getAnimation(it->second), true);
+
+							tile->addComponent<CTransform>(Vec2(0, 0));
+							tile->getComponent<CTransform>().scale = m_gridSize / m_game->assets().getAnimation(it->second).getSize();
+
+							tile->addComponent<CBoundingBox>(m_gridSize);
+
+							gridToMidPixel(i, j, tile);
+
+						}
+					}
+				}
+			}
+		}
+
+		if (temp == "Dec")
+		{
+			fin >> temp;
+			std::string name = temp;
+
+			fin >> temp;
+			int fromX = std::stoi(temp);
+
+			fin >> temp;
+			int fromY = std::stoi(temp);
+
+			fin >> temp;
+			int toX = std::stoi(temp);
+
+			fin >> temp;
+			int toY = std::stoi(temp);
+
+			auto it = tableLevel.find(name);
+			if (it == tableLevel.end()) {
+				// name not found
+				cout << name << " not found in system" << endl;
+			}
+			else 
+			{
+				// name found
+				if (!((fromX & fromY & toX & toY) >= 0))
+				{
+					cout << "invalid coordinat, do not use negative value!" << endl;
+				} 
+				else
+				{
+					for (int i = fromX; i <= toX; i++)
+					{
+						for (int j = fromY; j <= toY; j++)
+						{
+							auto dec = m_entityManager.addEntity(Dec);
+							dec->addComponent<CAnimation>(m_game->assets().getAnimation(it->second), true);
+							dec->addComponent<CTransform>(Vec2(0, 0));
+							dec->getComponent<CTransform>().scale = m_gridSize / m_game->assets().getAnimation(it->second).getSize();
+							gridToMidPixel(i, j, dec);
+						}
+					}
+				}
+			}
+		}
+	}
+
+	// spawn player when level has been loaded
 	spawnPlayer();
-
-	// sample entities
-	auto ground = m_entityManager.addEntity(Tile);
-	ground->addComponent<CAnimation>(m_game->assets().getAnimation(AniGround), true);
-	ground->addComponent<CTransform>(Vec2(300, 300));
-
-	auto brick = m_entityManager.addEntity(Tile);
-	brick->addComponent<CAnimation>(m_game->assets().getAnimation(AniBlock), true);
-	brick->addComponent<CTransform>(Vec2(400, 300));
 }
 
 void Scene_Play::update()
@@ -112,6 +211,11 @@ void Scene_Play::sMovement()
 	{
 		if (e->hasComponent<CTransform>() && e->hasComponent<CAnimation>())
 		{
+			e->getComponent<CAnimation>().animation.getSprite().setScale
+			(
+				e->getComponent<CTransform>().scale.x, 
+				e->getComponent<CTransform>().scale.y
+			);
 			e->getComponent<CAnimation>().animation.getSprite().setPosition
 			(
 				e->getComponent<CTransform>().pos.x + e->getComponent<CTransform>().velocity.x,
@@ -133,6 +237,24 @@ void Scene_Play::sRender()
 			if (e->hasComponent<CAnimation>())
 			{
 				m_game->window().draw(e->getComponent<CAnimation>().animation.getSprite());
+			}
+		}
+	}
+
+	if (m_drawBoundingBox)
+	{
+		for (auto& e : m_entityManager.getEntities())
+		{
+			if (e->hasComponent<CBoundingBox>())
+			{
+				sf::RectangleShape bb;
+				bb.setOutlineColor(sf::Color::Red);
+				bb.setFillColor(sf::Color::Transparent);
+				bb.setOutlineThickness(1.2f);
+				bb.setOrigin(e->getComponent<CBoundingBox>().halfSize.x, e->getComponent<CBoundingBox>().halfSize.y);
+				bb.setPosition(sf::Vector2f(e->getComponent<CTransform>().pos.x, e->getComponent<CTransform>().pos.y));
+				bb.setSize(sf::Vector2f(e->getComponent<CBoundingBox>().size.x, e->getComponent<CBoundingBox>().size.y));
+				m_game->window().draw(bb);
 			}
 		}
 	}
@@ -190,5 +312,13 @@ void Scene_Play::doAction(const Action& action)
 Vec2 Scene_Play::gridToMidPixel(float gridX, float gridY, std::shared_ptr<Entity> entity)
 {
 	// convert grid to pixel
-	return Vec2(0.0f, 0.0f);
+	float yPixel = height() - m_gridSize.y / 2 - gridY * m_gridSize.y;
+	float xPixel = m_gridSize.x / 2 + gridX * m_gridSize.x;
+
+	// pixel position
+	Vec2 pixelPos = Vec2(xPixel, yPixel);
+
+	entity->getComponent<CTransform>().pos = pixelPos;
+
+	return pixelPos;
 }
