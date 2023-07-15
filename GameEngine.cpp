@@ -23,8 +23,8 @@ static std::map<std::string, EnumTexture> const textureTable =
 
 static std::map<std::string, EnumAnimation> const animTable =
 {
-	{"AniGround", EnumAnimation::AniGround}, {"AniBlock", EnumAnimation::AniBrick}, 
-	{"AniBlockCoin", EnumAnimation::AniBlockCoin},
+	{"AniGround", EnumAnimation::AniGround}, {"AniBrick", EnumAnimation::AniBrick}, 
+	{"AniBlockCoin", EnumAnimation::AniBlockCoin}, {"AniStand", EnumAnimation::AniStand}
 };
 
 GameEngine::GameEngine(const std::string& path)
@@ -149,6 +149,7 @@ void GameEngine::init(const std::string& path)
 	}
 	m_assets.getAnimation(AniBrick).setIntRect(17, 0);
 	m_assets.getAnimation(AniGround).setIntRect(0, 0);
+	m_assets.getAnimation(AniStand).setIntRect(3, 22, 21, 23);
 }
 
 void GameEngine::run()

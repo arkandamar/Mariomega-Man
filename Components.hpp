@@ -87,19 +87,21 @@ public:
 class CGravity : public Component
 {
 public:
-	size_t accel = 0;
+	float accel = 0;
 
 	CGravity();
-	CGravity(size_t accel);
+	CGravity(float accel);
 };
+
+enum EnumState { onDefault = -1, onGround, onAir, onRun, onStand, STATE_COUNT = onStand + 1 };
 
 class CState : public Component
 {
 public:
-	bool onGround = true;
+	EnumState state = onDefault;
 
 	CState();
-	CState(bool groundState);
+	CState(EnumState state);
 };
 
 class CBoundingBox : public Component

@@ -3,6 +3,7 @@
 #include "Scene_Play.hpp"
 #include "GameEngine.hpp"
 #include "Scene_Menu.hpp"
+#include "Physics.hpp"
 
 #include <iostream>
 #include <fstream>
@@ -12,7 +13,7 @@ using std::endl;
 
 std::map<std::string, EnumAnimation> tableLevel =
 {
-	{"Ground", AniGround}, {"Brick", AniBrick}
+	{"Ground", AniGround}, {"Brick", AniBrick}, {"BlockCoin", AniBlockCoin}
 };
 
 Scene_Play::Scene_Play(GameEngine* gameEngine, const std::string& levelPath)
@@ -35,6 +36,7 @@ void Scene_Play::init()
 
 	m_gridText.setCharacterSize(12);
 	m_gridText.setFont(m_game->assets().getFont(FontRoboto));
+	m_gridSize = Vec2(64, 64);
 
 	// load level config
 	loadLevel(m_levelPath);
@@ -157,10 +159,10 @@ void Scene_Play::update()
 {
 	m_entityManager.update();
 
-	sLifespan();
-	sCollision();
-	sAnimation();
 	sMovement();
+	sLifespan();
+	sAnimation();
+	sCollision();
 	sRender();
 
 	// update current frame
@@ -184,6 +186,22 @@ void Scene_Play::sDoAction(const Action& action)
 			case ShowTexture: m_drawTextures = !m_drawTextures; break;
 			case ShowGrid: m_drawGrid = !m_drawGrid; break;
 			case ShowCollision: m_drawBoundingBox = !m_drawBoundingBox; break;
+			case Jump: m_player->getComponent<CInput>().up = true; break;
+			case Right: m_player->getComponent<CInput>().right = true; break;
+			case Left: m_player->getComponent<CInput>().left = true; break;
+			case Shoot: m_player->getComponent<CInput>().shoot = true; break;
+			default: break;
+		}
+	}
+
+	if (action.actionType() == KeyRelease)
+	{
+		switch (action.actionName())
+		{
+			case Jump: m_player->getComponent<CInput>().up = false; break;
+			case Right: m_player->getComponent<CInput>().right = false; break;
+			case Left: m_player->getComponent<CInput>().left = false; break;
+			case Shoot: m_player->getComponent<CInput>().shoot = false; break;
 			default: break;
 		}
 	}
@@ -197,11 +215,68 @@ void Scene_Play::sLifespan()
 void Scene_Play::sCollision()
 {
 	// collision system
+	for (auto& e : m_entityManager.getEntities(Tile))
+	{
+		if (e->hasComponent<CBoundingBox>() && e->hasComponent<CTransform>())
+		{
+			Vec2 sumHalf = m_player->getComponent<CBoundingBox>().halfSize + e->getComponent<CBoundingBox>().halfSize;
+			Vec2 diff = m_player->getComponent<CTransform>().pos - e->getComponent<CTransform>().pos;
+			Vec2 absDiff = Vec2(abs(diff.x), abs(diff.y));
+
+			Physics overlap;
+
+			if (absDiff.y < sumHalf.y && absDiff.x < sumHalf.x)
+			{
+				Vec2 prevSumHalf = m_player->getComponent<CBoundingBox>().halfSize + e->getComponent<CBoundingBox>().halfSize;
+				Vec2 prevDiff = m_player->getComponent<CTransform>().prevPos - e->getComponent<CTransform>().prevPos;
+				Vec2 absPrevDiff = Vec2(abs(prevDiff.x), abs(prevDiff.y));
+
+				Vec2 ol = overlap.GetOverlap(m_player, e);
+
+				if (absPrevDiff.x < prevSumHalf.x)
+				{
+					if (prevDiff.y < 0)
+					{
+						m_player->getComponent<CState>().state = onGround;
+						m_player->getComponent<CTransform>().pos.y -= ol.y;
+						m_player->getComponent<CTransform>().velocity.y -= ol.y;
+					}
+					else
+					{
+						m_player->getComponent<CTransform>().pos.y += ol.y;
+						m_player->getComponent<CTransform>().velocity.y += ol.y;
+					}
+				}
+
+				if (absPrevDiff.y < prevSumHalf.y)
+				{
+					if (prevDiff.x < 0)
+					{
+						m_player->getComponent<CTransform>().pos.x -= ol.x;
+						m_player->getComponent<CTransform>().velocity.x -= ol.x;
+					}
+					else
+					{
+						m_player->getComponent<CTransform>().pos.x += ol.x;
+						m_player->getComponent<CTransform>().velocity.x += ol.x;
+					}
+				}
+			}
+		}
+	}
 }
 
 void Scene_Play::sAnimation()
 {
 	// animation system
+	for (auto& e : m_entityManager.getEntities())
+	{
+		if (e->hasComponent<CAnimation>())
+		{
+			e->getComponent<CAnimation>().animation.update();
+			e->getComponent<CAnimation>().animation.hasEnded();
+		}
+	}
 }
 
 void Scene_Play::sMovement()
@@ -211,22 +286,73 @@ void Scene_Play::sMovement()
 	{
 		if (e->hasComponent<CTransform>() && e->hasComponent<CAnimation>())
 		{
+			if (e->hasComponent<CGravity>())
+			{
+				e->getComponent<CTransform>().velocity.y += e->getComponent<CGravity>().accel;
+			}
+
 			e->getComponent<CAnimation>().animation.getSprite().setScale
 			(
 				e->getComponent<CTransform>().scale.x, 
 				e->getComponent<CTransform>().scale.y
 			);
+
+			e->getComponent<CTransform>().prevPos = e->getComponent<CTransform>().pos;
+
 			e->getComponent<CAnimation>().animation.getSprite().setPosition
 			(
-				e->getComponent<CTransform>().pos.x + e->getComponent<CTransform>().velocity.x,
-				e->getComponent<CTransform>().pos.y + e->getComponent<CTransform>().velocity.y
+				e->getComponent<CTransform>().pos.x += e->getComponent<CTransform>().velocity.x,
+				e->getComponent<CTransform>().pos.y += e->getComponent<CTransform>().velocity.y
 			);
+		}
+	}
+
+	if (m_player->getComponent<CInput>().up && (m_player->getComponent<CState>().state == onGround))
+	{
+		m_player->getComponent<CState>().state = onAir;
+		m_player->getComponent<CTransform>().velocity.y -= 8;
+	}
+
+	if (!m_player->getComponent<CInput>().right && !m_player->getComponent<CInput>().left)
+	{
+		m_player->getComponent<CTransform>().velocity.x = 0;
+	} 
+	else
+	{
+		if (m_player->getComponent<CInput>().right && m_player->getComponent<CTransform>().velocity.x < 10)
+		{
+			m_player->getComponent<CTransform>().velocity.x += 1;
+
+			if (m_player->getComponent<CTransform>().scale.x > 0)
+			{
+				m_player->getComponent<CTransform>().scale.x *= -1;
+			}
+		}
+
+		if (m_player->getComponent<CInput>().left && m_player->getComponent<CTransform>().velocity.x > -10)
+		{
+			if (m_player->getComponent<CTransform>().pos.x > 64)
+			{
+				m_player->getComponent<CTransform>().velocity.x -= 1;
+
+				if (m_player->getComponent<CTransform>().scale.x < 0)
+				{
+					m_player->getComponent<CTransform>().scale.x *= -1;
+				}
+			}
 		}
 	}
 }
 
 void Scene_Play::sRender()
 {
+	// set viewport if window far enough right
+	auto& pPos = m_player->getComponent<CTransform>().pos;
+	float windowCenterX = std::max(m_game->window().getSize().x / 2.0f, pPos.x);
+	sf::View view = m_game->window().getView();
+	view.setCenter(windowCenterX, m_game->window().getSize().y - view.getCenter().y);
+	m_game->window().setView(view);
+
 	// render system
 	m_game->window().clear(sf::Color(97, 133, 248));
 
@@ -261,7 +387,7 @@ void Scene_Play::sRender()
 
 	if (m_drawGrid)
 	{
-		float leftX = m_game->window().getView().getCenter().x - width() / 2;
+		float leftX = m_game->window().getView().getCenter().x - (float) width() / 2;
 		float rightX = leftX + width() + m_gridSize.x;
 		float nextGridX = leftX - ((int)leftX % (int)m_gridSize.x);
 		
@@ -294,7 +420,31 @@ void Scene_Play::spawnPlayer()
 {
 	// spawn player
 	auto p = m_entityManager.addEntity(Player);
+
+	// add animation
+	p->addComponent<CAnimation>(m_game->assets().getAnimation(AniStand), true);
+
+	// add transform
+	p->addComponent<CTransform>(Vec2(0, 0));
+	p->getComponent<CTransform>().scale = m_gridSize / m_game->assets().getAnimation(AniStand).getSize();
+	p->getComponent<CTransform>().velocity = Vec2(0, 1);
+
+	// add bounding box
+	p->addComponent<CBoundingBox>(Vec2(56, 64));
+
+	// add gravity
+	p->addComponent<CGravity>(0.5);
+
+	// add input
 	p->addComponent<CInput>();
+
+	// add state
+	p->addComponent<CState>(onGround);
+
+	// rotate
+	p->getComponent<CTransform>().scale.x *= -1;
+
+	gridToMidPixel(0, 2, p);
 	m_player = p;
 }
 
@@ -309,7 +459,7 @@ void Scene_Play::doAction(const Action& action)
 	sDoAction(action);
 }
 
-Vec2 Scene_Play::gridToMidPixel(float gridX, float gridY, std::shared_ptr<Entity> entity)
+Vec2 Scene_Play::gridToMidPixel(int gridX, int gridY, std::shared_ptr<Entity> entity)
 {
 	// convert grid to pixel
 	float yPixel = height() - m_gridSize.y / 2 - gridY * m_gridSize.y;

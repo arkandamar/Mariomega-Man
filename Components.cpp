@@ -30,10 +30,10 @@ CAnimation::CAnimation() : animation(Animation()), repeat(false) {};
 CAnimation::CAnimation(const Animation& animation, bool loop) : animation(animation), repeat(loop) {};
 
 CGravity::CGravity() : accel() {};
-CGravity::CGravity(size_t accel) : accel(accel) {};
+CGravity::CGravity(float accel) : accel(accel) {};
 
-CState::CState() : onGround(true) {};
-CState::CState(bool groundState) : onGround(groundState) {};
+CState::CState() : state(onDefault) {};
+CState::CState(EnumState state) : state(state) {};
 
 CBoundingBox::CBoundingBox() : size(Vec2(0.0f, 0.0f)), halfSize(Vec2(0.0f, 0.0f)) {}
 CBoundingBox::CBoundingBox(Vec2 size) : size(size), halfSize(size / 2.0f) {};

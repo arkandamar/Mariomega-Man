@@ -18,7 +18,7 @@ protected:
 	bool m_drawBoundingBox = false;
 	bool m_drawGrid = false;
 	sf::Text m_gridText;
-	Vec2 m_gridSize = { 64, 64 };
+	Vec2 m_gridSize;
 
 	void loadLevel(const std::string& filename);
 	void init();
@@ -35,7 +35,7 @@ protected:
 	void spawnPlayer();
 	void spawnBullet(std::shared_ptr<Entity> entity);
 
-	Vec2 gridToMidPixel(float gridX, float gridY, std::shared_ptr<Entity> entity);
+	Vec2 gridToMidPixel(int gridX, int gridY, std::shared_ptr<Entity> entity);
 
 public:
 	Scene_Play(GameEngine* gameEngine, const std::string& levelPath);

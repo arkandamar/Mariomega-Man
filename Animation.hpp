@@ -15,15 +15,17 @@ class Animation
 	size_t m_frameDuration = 0;
 	Vec2 m_size = Vec2(0.0f, 0.0f);
 
-	void update();
 
 public:
 	Animation();
 	Animation(EnumAnimation name, const sf::Texture& t);
 	Animation(EnumAnimation name, const sf::Texture& t, size_t frameCount, size_t duration, Vec2 size);
 
+	void update();
+
 	// setter
 	void setIntRect(int x, int y);
+	void setIntRect(int x, int y, int sizeX, int sizeY);
 
 	// getter
 	const Vec2& getSize() const;
