@@ -173,6 +173,8 @@ void Scene_Play::onEnd()
 {
 	// change scene to scene menu when end
 	m_game->changeScene(MenuScene, std::make_shared<Scene_Menu>(m_game), true);
+
+	m_game->window().setView(m_game->window().getDefaultView());
 }
 
 void Scene_Play::sDoAction(const Action& action)
@@ -189,7 +191,22 @@ void Scene_Play::sDoAction(const Action& action)
 			case Jump: m_player->getComponent<CInput>().up = true; break;
 			case Right: m_player->getComponent<CInput>().right = true; break;
 			case Left: m_player->getComponent<CInput>().left = true; break;
-			case Shoot: m_player->getComponent<CInput>().shoot = true; break;
+			case Shoot: 
+				if (m_player->getComponent<CInput>().canShoot)
+				{
+					spawnBullet(m_player);
+
+					if (m_player->getComponent<CState>().state == onWalk)
+						m_player->getComponent<CState>().state = onShootWalk;
+
+					if (m_player->getComponent<CState>().state == onGround)
+						m_player->getComponent<CState>().state = onShoot;
+
+					if (m_player->getComponent<CState>().state == onAir)
+						m_player->getComponent<CState>().state = onShootAir;
+
+					m_player->getComponent<CInput>().canShoot = false; break;
+				}
 			default: break;
 		}
 	}
@@ -201,7 +218,9 @@ void Scene_Play::sDoAction(const Action& action)
 			case Jump: m_player->getComponent<CInput>().up = false; break;
 			case Right: m_player->getComponent<CInput>().right = false; break;
 			case Left: m_player->getComponent<CInput>().left = false; break;
-			case Shoot: m_player->getComponent<CInput>().shoot = false; break;
+			case Shoot: 
+				m_player->getComponent<CState>().state = onAir;
+				m_player->getComponent<CInput>().canShoot = true; break;
 			default: break;
 		}
 	}
@@ -237,7 +256,16 @@ void Scene_Play::sCollision()
 				{
 					if (prevDiff.y < 0)
 					{
-						m_player->getComponent<CState>().state = onGround;
+						if (m_player->getComponent<CState>().state != onShoot && m_player->getComponent<CInput>().canShoot)
+						{
+							m_player->getComponent<CState>().state = onGround;
+						}
+
+						if (m_player->getComponent<CState>().state == onShootAir)
+						{
+							m_player->getComponent<CState>().state = onShoot;
+						}
+
 						m_player->getComponent<CTransform>().pos.y -= ol.y;
 						m_player->getComponent<CTransform>().velocity.y -= ol.y;
 					}
@@ -245,6 +273,7 @@ void Scene_Play::sCollision()
 					{
 						m_player->getComponent<CTransform>().pos.y += ol.y;
 						m_player->getComponent<CTransform>().velocity.y += ol.y;
+						e->destroy();
 					}
 				}
 
@@ -262,6 +291,11 @@ void Scene_Play::sCollision()
 					}
 				}
 			}
+
+			if (m_player->getComponent<CTransform>().pos.x < m_player->getComponent<CBoundingBox>().halfSize.x)
+			{
+				m_player->getComponent<CTransform>().pos.x = m_player->getComponent<CBoundingBox>().halfSize.x;
+			}
 		}
 	}
 }
@@ -274,8 +308,43 @@ void Scene_Play::sAnimation()
 		if (e->hasComponent<CAnimation>())
 		{
 			e->getComponent<CAnimation>().animation.update();
-			e->getComponent<CAnimation>().animation.hasEnded();
 		}
+	}
+
+	switch (m_player->getComponent<CState>().state)
+	{
+	case onAir: 
+		if (m_player->getComponent<CAnimation>().animation.getName() != AniJump)
+			m_player->addComponent<CAnimation>(m_game->assets().getAnimation(AniJump), true);
+		break;
+
+	case onGround:
+		if (m_player->getComponent<CAnimation>().animation.getName() != AniStand)
+			m_player->addComponent<CAnimation>(m_game->assets().getAnimation(AniStand), true);
+		break;
+
+	case onWalk:
+		if (m_player->getComponent<CAnimation>().animation.getName() != AniWalk)
+			m_player->addComponent<CAnimation>(m_game->assets().getAnimation(AniWalk), true);
+		break;
+
+	case onShoot:
+		if (m_player->getComponent<CAnimation>().animation.getName() != AniShoot)
+			m_player->addComponent<CAnimation>(m_game->assets().getAnimation(AniShoot), true);
+		break;
+
+	case onShootAir:
+		if (m_player->getComponent<CAnimation>().animation.getName() != AniShootAir)
+			m_player->addComponent<CAnimation>(m_game->assets().getAnimation(AniShootAir), true);
+		break;
+
+	case onShootWalk:
+		if (m_player->getComponent<CAnimation>().animation.getName() != AniShootWalk)
+			m_player->addComponent<CAnimation>(m_game->assets().getAnimation(AniShootWalk), true);
+		break;
+
+	default:
+		break;
 	}
 }
 
@@ -319,6 +388,11 @@ void Scene_Play::sMovement()
 	} 
 	else
 	{
+		if (m_player->getComponent<CState>().state == onGround)
+		{
+			m_player->getComponent<CState>().state = onWalk;
+		}
+
 		if (m_player->getComponent<CInput>().right && m_player->getComponent<CTransform>().velocity.x < 10)
 		{
 			m_player->getComponent<CTransform>().velocity.x += 1;
@@ -331,14 +405,11 @@ void Scene_Play::sMovement()
 
 		if (m_player->getComponent<CInput>().left && m_player->getComponent<CTransform>().velocity.x > -10)
 		{
-			if (m_player->getComponent<CTransform>().pos.x > 64)
-			{
-				m_player->getComponent<CTransform>().velocity.x -= 1;
+			m_player->getComponent<CTransform>().velocity.x -= 1;
 
-				if (m_player->getComponent<CTransform>().scale.x < 0)
-				{
-					m_player->getComponent<CTransform>().scale.x *= -1;
-				}
+			if (m_player->getComponent<CTransform>().scale.x < 0)
+			{
+				m_player->getComponent<CTransform>().scale.x *= -1;
 			}
 		}
 	}
@@ -444,7 +515,7 @@ void Scene_Play::spawnPlayer()
 	// rotate
 	p->getComponent<CTransform>().scale.x *= -1;
 
-	gridToMidPixel(0, 2, p);
+	gridToMidPixel(0, 3, p);
 	m_player = p;
 }
 

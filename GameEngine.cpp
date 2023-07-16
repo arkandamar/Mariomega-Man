@@ -24,7 +24,10 @@ static std::map<std::string, EnumTexture> const textureTable =
 static std::map<std::string, EnumAnimation> const animTable =
 {
 	{"AniGround", EnumAnimation::AniGround}, {"AniBrick", EnumAnimation::AniBrick}, 
-	{"AniBlockCoin", EnumAnimation::AniBlockCoin}, {"AniStand", EnumAnimation::AniStand}
+	{"AniBlockCoin", EnumAnimation::AniBlockCoin}, {"AniStand", EnumAnimation::AniStand},
+	{"AniWalk", EnumAnimation::AniWalk}, {"AniJump", EnumAnimation::AniJump},
+	{"AniShoot", EnumAnimation::AniShoot}, {"AniShootWalk", EnumAnimation::AniShootWalk},
+	{"AniShootAir", EnumAnimation::AniShootAir}
 };
 
 GameEngine::GameEngine(const std::string& path)
@@ -135,21 +138,23 @@ void GameEngine::init(const std::string& path)
 					cout << "cannot find texture associated with " << texture << endl;
 				}
 				else {
-					m_assets.addAniType(it->second, ut->second, frameCout, duration);
+					// register animation to texture
+					m_assets.registerAnimation(it->second, ut->second, frameCout, duration, Vec2(16, 16));
 					cout << name << " loaded" << endl;
 				}
 			}
 		}
 	}
 
-	// register animation to texture
-	for (auto it = animTable.begin(); it != animTable.end(); it++)
-	{
-		m_assets.registerAnimation(it->second, Vec2(16, 16));
-	}
+	// init animation
 	m_assets.getAnimation(AniBrick).setIntRect(17, 0);
 	m_assets.getAnimation(AniGround).setIntRect(0, 0);
 	m_assets.getAnimation(AniStand).setIntRect(3, 22, 21, 23);
+	m_assets.getAnimation(AniWalk).setIntRect(92, 21, 24, 24);
+	m_assets.getAnimation(AniJump).setIntRect(177, 13, 26, 30);
+	m_assets.getAnimation(AniShoot).setIntRect(1, 78, 31, 24);
+	m_assets.getAnimation(AniShootAir).setIntRect(141, 70, 30, 30);
+	m_assets.getAnimation(AniShootWalk).setIntRect(38, 78, 30, 24);
 }
 
 void GameEngine::run()

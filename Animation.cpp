@@ -18,13 +18,17 @@ Animation::Animation(EnumAnimation name, const sf::Texture& t, size_t frameCount
 }
 
 // setter
-void Animation::setIntRect(int x, int y)
+void Animation::setIntRect(int x, int y, int space)
 {
+	m_space = space;
+	m_initPos = Vec2(x, y);
 	m_sprite.setTextureRect(sf::IntRect(x, y, (int) m_size.x, (int) m_size.y));
 }
 
-void Animation::setIntRect(int x, int y, int sizeX, int sizeY)
+void Animation::setIntRect(int x, int y, int sizeX, int sizeY, int space)
 {
+	m_space = space;
+	m_initPos = Vec2(x, y);
 	m_size = Vec2(sizeX, sizeY);
 	m_sprite.setOrigin(m_size.x / 2, m_size.y / 2);
 	m_sprite.setTextureRect(sf::IntRect(x, y, m_size.x, m_size.y));
@@ -39,7 +43,7 @@ void Animation::update()
 		int indexTexture = (m_currentFrame / m_frameDuration) % m_frameCount;
 
 		// set texture rectangle properly
-		m_sprite.setTextureRect(sf::IntRect(indexTexture * m_size.x, m_sprite.getTextureRect().getPosition().y, m_size.x, m_size.y));
+		m_sprite.setTextureRect(sf::IntRect(m_initPos.x + (indexTexture * m_size.x + m_space), m_initPos.y, m_size.x, m_size.y));
 
 		m_currentFrame++;
 	}

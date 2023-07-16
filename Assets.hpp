@@ -31,8 +31,6 @@ public:
 	void addAnimation(EnumAnimation name, Animation animation);
 	void addFont(EnumFont name, const std::string& path);
 	void addSound(EnumSound name, const std::string& path);
-	void addAniType(EnumAnimation name, EnumTexture texture, int frameCount, int frameDuration);
-	void registerAnimation(EnumAnimation name, Vec2 size);
 	void registerAnimation(EnumAnimation name, EnumTexture texture, int frameCount, int duration, Vec2 size);
 
 	// getter

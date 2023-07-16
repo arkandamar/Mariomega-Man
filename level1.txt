@@ -8,3 +8,4 @@ Tile		Brick		7		6		7		6
 Tile		Brick		9		6		9		6
 Tile		BlockCoin	4		6		4		6
 Tile		BlockCoin	8		6		8		6
+Tile		Ground		23		0		29		0

@@ -69,7 +69,7 @@ public:
 	bool left = false;
 	bool right = false;
 	bool down = false;
-	bool shoot = false;
+	bool canShoot = true;
 
 	CInput();
 };
@@ -93,7 +93,7 @@ public:
 	CGravity(float accel);
 };
 
-enum EnumState { onDefault = -1, onGround, onAir, onRun, onStand, STATE_COUNT = onStand + 1 };
+enum EnumState { onDefault = -1, onGround, onAir, onShootAir, onShootWalk, onShoot, onWalk, onStand, STATE_COUNT = onStand + 1 };
 
 class CState : public Component
 {
