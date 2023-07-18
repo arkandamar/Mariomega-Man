@@ -10,6 +10,7 @@ Texture		name=TexBlockCoin		path=assets/block_coin.png
 Texture		name=TexCoinArise		path=assets/coin_arise.png
 Texture		name=TexMegaman			path=assets/megaman.png
 Texture		name=TexMegamanShoot	path=assets/megaman_shoot.png
+Texture		nmee=TexExplosion		path=assets/explosion.png
 
 Animation	name=AniBrick			texture=TexBlock				frameCout=1		frameDuration=0
 Animation	name=AniGround			texture=TexBlock				frameCout=1		frameDuration=0
@@ -20,6 +21,9 @@ Animation	name=AniJump			texture=TexMegaman				frameCount=1	frameDuration=0
 Animation	name=AniShoot			texture=TexMegaman				frameCount=1	frameDuration=0
 Animation	name=AniShootAir		texture=TexMegaman				frameCount=1	frameDuration=0
 Animation	name=AniShootWalk		texture=TexMegaman				frameCount=3	frameDuration=8
+Animation	name=AniBullet			texture=TexMegamanShoot			frameCount=6	frameDuration=8
+Animation	name=AniExplosion		texture=TexExplosion			frameCount=3	frameDuration=10
+Animation	name=AniCoinArise		texture=TexCoinArise			frameCount=4	frameDuration=6
 
 Player radius=32 coll_radius=32 speed=5 fill_rgb(50,5,5) out_rgb(255,0,0) thick=4 vert=8 special_weapon_cooldown=300
 Enemy radius=32 coll_radius=32 speed_min=3 speed_max=4 out_rgb(255,255,255) thick=2 vert_min=3 vert_max=8 lifespan=90 spawn_rate=60

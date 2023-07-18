@@ -27,7 +27,10 @@ CLifespan::CLifespan(int total) : remaining(total), total(total) {};
 CInput::CInput() {};
 
 CAnimation::CAnimation() : animation(Animation()), repeat(false) {};
-CAnimation::CAnimation(const Animation& animation, bool loop) : animation(animation), repeat(loop) {};
+CAnimation::CAnimation(const Animation& ani, bool rep) : animation(ani), repeat(rep) 
+{
+	animation.setRepeat(repeat);
+};
 
 CGravity::CGravity() : accel() {};
 CGravity::CGravity(float accel) : accel(accel) {};

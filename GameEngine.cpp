@@ -17,17 +17,18 @@ static std::map<std::string, EnumFont> const fontTable =
 static std::map<std::string, EnumTexture> const textureTable =
 {
 	{"TexBlock", EnumTexture::TexBlock}, {"TexCloud", EnumTexture::TextCloud}, {"TexBlockCoin", EnumTexture::TexBlockCoin},
-	{"TexCoinObtain", EnumTexture::TexCoinObtain}, {"TexCoinArise", EnumTexture::TexCoinArise},
+	{"TexCoinObtain", EnumTexture::TexCoinObtain}, {"TexCoinArise", EnumTexture::TexCoinArise}, {"TexExplosion", EnumTexture::TexExplosion},
 	{"TexPipeScenery", EnumTexture::TexPipeScenery}, {"TexMegaman", EnumTexture::TexMegaman}, {"TexMegamanShoot", EnumTexture::TexMegamanShoot}
 };
 
 static std::map<std::string, EnumAnimation> const animTable =
 {
-	{"AniGround", EnumAnimation::AniGround}, {"AniBrick", EnumAnimation::AniBrick}, 
+	{"AniGround", EnumAnimation::AniGround}, {"AniBrick", EnumAnimation::AniBrick},
 	{"AniBlockCoin", EnumAnimation::AniBlockCoin}, {"AniStand", EnumAnimation::AniStand},
 	{"AniWalk", EnumAnimation::AniWalk}, {"AniJump", EnumAnimation::AniJump},
 	{"AniShoot", EnumAnimation::AniShoot}, {"AniShootWalk", EnumAnimation::AniShootWalk},
-	{"AniShootAir", EnumAnimation::AniShootAir}
+	{"AniShootAir", EnumAnimation::AniShootAir}, {"AniBullet", EnumAnimation::AniBullet},
+	{"AniExplosion", EnumAnimation::AniExplosion}, {"AniCoinArise", EnumAnimation::AniCoinArise},
 };
 
 GameEngine::GameEngine(const std::string& path)
@@ -155,6 +156,15 @@ void GameEngine::init(const std::string& path)
 	m_assets.getAnimation(AniShoot).setIntRect(1, 78, 31, 24);
 	m_assets.getAnimation(AniShootAir).setIntRect(141, 70, 30, 30);
 	m_assets.getAnimation(AniShootWalk).setIntRect(38, 78, 30, 24);
+	m_assets.getAnimation(AniBullet).setIntRect(0, 0, 24, 24);
+	m_assets.getAnimation(AniExplosion).setIntRect(0, 0, 16, 16);
+	m_assets.getAnimation(AniCoinArise).setIntRect(0, 0, 8, 16);
+
+	// register dead animation seperately
+	m_assets.registerAnimation(AniSplash, TexMegamanShoot, 1, 5, Vec2(24, 24));
+	m_assets.getAnimation(AniSplash).setIntRect(144, 0);
+	m_assets.registerAnimation(AniUsedBlockCoin, TexBlockCoin, 1, 0, Vec2(16, 16));
+	m_assets.getAnimation(AniUsedBlockCoin).setIntRect(48, 0);
 }
 
 void GameEngine::run()

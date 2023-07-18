@@ -196,9 +196,6 @@ void Scene_Play::sDoAction(const Action& action)
 				{
 					spawnBullet(m_player);
 
-					if (m_player->getComponent<CState>().state == onWalk)
-						m_player->getComponent<CState>().state = onShootWalk;
-
 					if (m_player->getComponent<CState>().state == onGround)
 						m_player->getComponent<CState>().state = onShoot;
 
@@ -229,6 +226,17 @@ void Scene_Play::sDoAction(const Action& action)
 void Scene_Play::sLifespan()
 {
 	// lifespan system
+	for (auto& e : m_entityManager.getEntities())
+	{
+		if (e->hasComponent<CLifespan>())
+		{
+			if (e->getComponent<CLifespan>().remaining <= 0)
+			{
+				e->destroy();
+			}
+			e->getComponent<CLifespan>().remaining--;
+		}
+	}
 }
 
 void Scene_Play::sCollision()
@@ -236,6 +244,7 @@ void Scene_Play::sCollision()
 	// collision system
 	for (auto& e : m_entityManager.getEntities(Tile))
 	{
+		// collision to player
 		if (e->hasComponent<CBoundingBox>() && e->hasComponent<CTransform>())
 		{
 			Vec2 sumHalf = m_player->getComponent<CBoundingBox>().halfSize + e->getComponent<CBoundingBox>().halfSize;
@@ -254,36 +263,56 @@ void Scene_Play::sCollision()
 
 				if (absPrevDiff.x < prevSumHalf.x)
 				{
+					// when player collide from up
 					if (prevDiff.y < 0)
 					{
 						if (m_player->getComponent<CState>().state != onShoot && m_player->getComponent<CInput>().canShoot)
-						{
 							m_player->getComponent<CState>().state = onGround;
-						}
 
 						if (m_player->getComponent<CState>().state == onShootAir)
-						{
 							m_player->getComponent<CState>().state = onShoot;
-						}
 
 						m_player->getComponent<CTransform>().pos.y -= ol.y;
 						m_player->getComponent<CTransform>().velocity.y -= ol.y;
 					}
+					// when player collide from below
 					else
 					{
+						if (e->getComponent<CAnimation>().animation.getName() == AniBlockCoin)
+						{
+							e->addComponent<CAnimation>(m_game->assets().getAnimation(AniUsedBlockCoin), true);
+
+							auto coin = m_entityManager.addEntity(Dec);
+							coin->addComponent<CAnimation>(m_game->assets().getAnimation(AniCoinArise), true);
+							coin->addComponent<CTransform>(Vec2(e->getComponent<CTransform>().pos.x, e->getComponent<CTransform>().pos.y - 64));
+							coin->getComponent<CTransform>().scale = m_gridSize / e->getComponent<CAnimation>().animation.getSize();
+							coin->addComponent<CLifespan>(30);
+						}
+
+						if (e->getComponent<CAnimation>().animation.getName() == AniBrick)
+						{
+							e->addComponent<CAnimation>(m_game->assets().getAnimation(AniExplosion), false);
+							e->removeComponent<CBoundingBox>();
+
+							m_player->getComponent<CTransform>().pos.y += 16;
+							m_player->getComponent<CTransform>().velocity.y += 16;
+						}
+
 						m_player->getComponent<CTransform>().pos.y += ol.y;
 						m_player->getComponent<CTransform>().velocity.y += ol.y;
-						e->destroy();
 					}
 				}
 
 				if (absPrevDiff.y < prevSumHalf.y)
 				{
+					// when player collide from left
 					if (prevDiff.x < 0)
 					{
 						m_player->getComponent<CTransform>().pos.x -= ol.x;
 						m_player->getComponent<CTransform>().velocity.x -= ol.x;
 					}
+
+					// when player collide from right
 					else
 					{
 						m_player->getComponent<CTransform>().pos.x += ol.x;
@@ -296,6 +325,33 @@ void Scene_Play::sCollision()
 			{
 				m_player->getComponent<CTransform>().pos.x = m_player->getComponent<CBoundingBox>().halfSize.x;
 			}
+
+			// collision with bullet
+			for (auto& b : m_entityManager.getEntities(Bullet))
+			{
+				if (b->hasComponent<CBoundingBox>() && b->hasComponent<CTransform>())
+				{
+					Vec2 sumHalf = b->getComponent<CBoundingBox>().halfSize + e->getComponent<CBoundingBox>().halfSize;
+					Vec2 diff = b->getComponent<CTransform>().pos - e->getComponent<CTransform>().pos;
+					Vec2 absDiff = Vec2(abs(diff.x), abs(diff.y));
+
+					// collision with bullet occur
+					if (absDiff.x < sumHalf.x && absDiff.y < sumHalf.y)
+					{
+						// if bullet is getting brick entity
+						if (e->getComponent<CAnimation>().animation.getName() == AniBrick)
+						{
+							e->addComponent<CAnimation>(m_game->assets().getAnimation(AniExplosion), false);
+							e->removeComponent<CBoundingBox>();
+						}
+
+						// destroyed bullet animation
+						b->getComponent<CTransform>().velocity = Vec2(0, 0);
+						b->addComponent<CAnimation>(m_game->assets().getAnimation(AniSplash), false);
+						b->removeComponent<CBoundingBox>();
+					}
+				}
+			}
 		}
 	}
 }
@@ -307,6 +363,11 @@ void Scene_Play::sAnimation()
 	{
 		if (e->hasComponent<CAnimation>())
 		{
+			if (e->getComponent<CAnimation>().animation.hasEnded())
+			{
+				e->destroy();
+			}
+
 			e->getComponent<CAnimation>().animation.update();
 		}
 	}
@@ -388,10 +449,11 @@ void Scene_Play::sMovement()
 	} 
 	else
 	{
+		if (m_player->getComponent<CState>().state == onShoot)
+			m_player->getComponent<CState>().state = onShootWalk;
+
 		if (m_player->getComponent<CState>().state == onGround)
-		{
 			m_player->getComponent<CState>().state = onWalk;
-		}
 
 		if (m_player->getComponent<CInput>().right && m_player->getComponent<CTransform>().velocity.x < 10)
 		{
@@ -504,13 +566,13 @@ void Scene_Play::spawnPlayer()
 	p->addComponent<CBoundingBox>(Vec2(56, 64));
 
 	// add gravity
-	p->addComponent<CGravity>(0.5);
+	p->addComponent<CGravity>(0.5f);
 
 	// add input
 	p->addComponent<CInput>();
 
 	// add state
-	p->addComponent<CState>(onGround);
+	p->addComponent<CState>(onAir);
 
 	// rotate
 	p->getComponent<CTransform>().scale.x *= -1;
@@ -522,6 +584,28 @@ void Scene_Play::spawnPlayer()
 void Scene_Play::spawnBullet(std::shared_ptr<Entity> entity)
 {
 	// spawn bullet
+	auto b = m_entityManager.addEntity(Bullet);
+
+	// add animation
+	b->addComponent<CAnimation>(m_game->assets().getAnimation(AniBullet), true);
+
+	// add transform
+	b->addComponent<CTransform>(Vec2(entity->getComponent<CTransform>().pos.x + entity->getComponent<CBoundingBox>().halfSize.x, entity->getComponent<CTransform>().pos.y));
+
+	// add velocity
+	b->getComponent<CTransform>().velocity = Vec2(15, 0);
+
+	// add scale
+	b->getComponent<CTransform>().scale = m_gridSize / m_game->assets().getAnimation(AniBullet).getSize();
+
+	// change velocity based on entity scale
+	if (entity->getComponent<CTransform>().scale.x > 0) b->getComponent<CTransform>().velocity.x *= -1;
+
+	// add bounding box
+	b->addComponent<CBoundingBox>(Vec2(32, 32));
+
+	// add lifespan
+	b->addComponent<CLifespan>(60);
 }
 
 void Scene_Play::doAction(const Action& action)

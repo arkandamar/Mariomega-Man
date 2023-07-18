@@ -5,17 +5,11 @@
 #include <array>
 #include <SFML/Audio.hpp>
 
-enum EnumTexture { TexMegaman, TexMegamanShoot, TexPipeScenery, TexCoinArise, TexCoinObtain, TexBlockCoin, TextCloud, TexBlock, TEX_COUNT = TexBlock + 1 };
+enum EnumTexture { TexMegaman, TexMegamanShoot, TexPipeScenery, TexCoinArise, TexExplosion, TexCoinObtain, TexBlockCoin, TextCloud, TexBlock, TEX_COUNT = TexBlock + 1 };
 enum EnumFont { FontMario, FontRoboto, FontMegaman, FONT_COUNT = FontMegaman + 1 };
 enum EnumSound { DeathSound, SOUND_COUNT = DeathSound + 1 };
 
-struct AniType
-{
-	EnumAnimation name;
-	EnumTexture texture;
-	int frameCount;
-	int frameDuration;
-};
+typedef std::map<int, std::vector<Animation>> chainAnimations;
 
 class Assets
 {
@@ -23,7 +17,7 @@ class Assets
 	std::array<Animation, EnumAnimation::ANI_COUNT> m_animations;
 	std::array<sf::Font, EnumFont::FONT_COUNT> m_fonts;
 	std::array<sf::Sound, EnumSound::SOUND_COUNT> m_sounds;
-	std::array<AniType, EnumAnimation::ANI_COUNT> m_aniType;
+	chainAnimations m_chainAnimations;
 
 public:
 	// setter
@@ -38,5 +32,4 @@ public:
 	Animation& getAnimation(EnumAnimation name);
 	sf::Font& getFont(EnumFont name);
 	sf::Sound& getSound(EnumSound name);
-	AniType& getAniType(EnumAnimation name);
 };

@@ -4,7 +4,9 @@
 
 #include <SFML/Graphics.hpp>
 
-enum EnumAnimation { AniDefault = -1, AniWalk, AniBlockCoin, AniShootAir, AniGround, AniShoot, AniShootWalk, AniJump, AniBrick, AniStand, ANI_COUNT = AniStand + 1 };
+enum EnumAnimation { AniDefault = -1, AniWalk, AniBlockCoin, AniUsedBlockCoin,
+	AniSplash, AniExplosion, AniBullet, AniShootAir, AniGround, AniCoinArise,
+	AniShoot, AniShootWalk, AniJump, AniBrick, AniStand, ANI_COUNT = AniStand + 1 };
 
 class Animation
 {
@@ -13,10 +15,10 @@ class Animation
 	size_t m_frameCount = 0;
 	size_t m_currentFrame = 0;
 	size_t m_frameDuration = 0;
-	size_t m_space = 0;
+	float m_space = 0;
 	Vec2 m_size = Vec2(0.0f, 0.0f);
 	Vec2 m_initPos = Vec2(0.0f, 0.0f);
-
+	bool m_repeat = false;
 
 public:
 	Animation();
@@ -26,8 +28,9 @@ public:
 	void update();
 
 	// setter
-	void setIntRect(int x, int y, int space = 0);
-	void setIntRect(int x, int y, int sizeX, int sizeY, int space = 0);
+	void setRepeat(bool repeat);
+	void setIntRect(float x, float y, float space = 0.0f);
+	void setIntRect(float x, float y, float sizeX, float sizeY, float space = 0.0f);
 
 	// getter
 	const Vec2& getSize() const;

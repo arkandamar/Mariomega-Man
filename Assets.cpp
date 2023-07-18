@@ -69,8 +69,3 @@ sf::Sound& Assets::getSound(EnumSound name)
 {
 	return m_sounds[name];
 }
-
-AniType& Assets::getAniType(EnumAnimation name)
-{
-	return m_aniType[name];
-}

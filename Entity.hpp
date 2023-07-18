@@ -17,7 +17,7 @@ typedef std::tuple<
 	CState
 > ComponentTuple;
 
-enum Tag { DefaultTag = -1, Player, Enemy, Tile, Dec, TAG_COUNT = Dec + 1 };
+enum Tag { DefaultTag = -1, Player, Enemy, Bullet, Tile, Dec, TAG_COUNT = Dec + 1 };
 
 class Entity
 {
