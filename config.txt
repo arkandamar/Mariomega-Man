@@ -1,5 +1,7 @@
 Window		width=1280				height=640						fullscreen=0	frame=60
 
+Level		levelCount=3
+
 Font		name=Roboto				path=assets/fonts/roboto.ttf
 Font		name=Mario				path=assets/fonts/mario.ttf
 Font		name=Megaman			path=assets/fonts/megaman.ttf
@@ -10,10 +12,11 @@ Texture		name=TexBlockCoin		path=assets/block_coin.png
 Texture		name=TexCoinArise		path=assets/coin_arise.png
 Texture		name=TexMegaman			path=assets/megaman.png
 Texture		name=TexMegamanShoot	path=assets/megaman_shoot.png
-Texture		nmee=TexExplosion		path=assets/explosion.png
+Texture		name=TexExplosion		path=assets/explosion.png
+Texture		name=TexPipeScenery		path=assets/pipe_scenery.png
 
-Animation	name=AniBrick			texture=TexBlock				frameCout=1		frameDuration=0
-Animation	name=AniGround			texture=TexBlock				frameCout=1		frameDuration=0
+Animation	name=AniBrick			texture=TexBlock				frameCount=1	frameDuration=0
+Animation	name=AniGround			texture=TexBlock				frameCount=1	frameDuration=0
 Animation	name=AniBlockCoin		texture=TexBlockCoin			frameCount=3	frameDuration=4
 Animation	name=AniStand			texture=TexMegaman				frameCount=2	frameDuration=180
 Animation	name=AniWalk			texture=TexMegaman				frameCount=3	frameDuration=8
@@ -24,6 +27,8 @@ Animation	name=AniShootWalk		texture=TexMegaman				frameCount=3	frameDuration=8
 Animation	name=AniBullet			texture=TexMegamanShoot			frameCount=6	frameDuration=8
 Animation	name=AniExplosion		texture=TexExplosion			frameCount=3	frameDuration=10
 Animation	name=AniCoinArise		texture=TexCoinArise			frameCount=4	frameDuration=6
+Animation	name=AniBlock			texture=TexBlock				frameCount=1	frameDuration=0
+Animation	name=AniBrickIns		texture=TexBlock				frameCount=1	frameDuration=0
 
 Player radius=32 coll_radius=32 speed=5 fill_rgb(50,5,5) out_rgb(255,0,0) thick=4 vert=8 special_weapon_cooldown=300
 Enemy radius=32 coll_radius=32 speed_min=3 speed_max=4 out_rgb(255,255,255) thick=2 vert_min=3 vert_max=8 lifespan=90 spawn_rate=60

@@ -11,9 +11,24 @@
 using std::cout;
 using std::endl;
 
+namespace utl {
+	int extractValue(const std::string& s, const std::string& del)
+	{
+		size_t del_pos = s.find(del);
+		return stoi(s.substr(del_pos + del.size(), s.size() - del_pos));
+	}
+
+	std::string extractValueStr(const std::string& s, const std::string& del)
+	{
+		size_t del_pos = s.find(del);
+		return s.substr(del_pos + del.size(), s.size() - del_pos);
+	}
+}
+
 std::map<std::string, EnumAnimation> tableLevel =
 {
-	{"Ground", AniGround}, {"Brick", AniBrick}, {"BlockCoin", AniBlockCoin}
+	{"Ground", AniGround}, {"Brick", AniBrick}, {"BlockCoin", AniBlockCoin}, {"Block", AniBlock},
+	{"BrickIns", AniBrickIns}
 };
 
 Scene_Play::Scene_Play(GameEngine* gameEngine, const std::string& levelPath)
@@ -97,7 +112,6 @@ void Scene_Play::loadLevel(const std::string& filename)
 							tile->addComponent<CBoundingBox>(m_gridSize);
 
 							gridToMidPixel(i, j, tile);
-
 						}
 					}
 				}
@@ -149,6 +163,105 @@ void Scene_Play::loadLevel(const std::string& filename)
 				}
 			}
 		}
+
+		if (temp == "Pipe")
+		{
+			fin >> temp;
+			int height = utl::extractValue(temp, "=");
+
+			fin >> temp;
+			int x = utl::extractValue(temp, "=");
+
+			fin >> temp;
+			int y = utl::extractValue(temp, "=");
+
+			for (int h = y; h <= height; h++)
+			{
+				int width = x + 1;
+				if (h < height)
+				{
+					for (int w = x; w <= width; w++)
+					{
+						EnumAnimation animationName = AniDefault;
+						if (w == width)
+						{
+							// ani 4
+							animationName = AniPipe4;
+						}
+						else
+						{
+							// ani 3
+							animationName = AniPipe3;
+						}
+						auto p = m_entityManager.addEntity(Tile);
+						p->addComponent<CAnimation>(m_game->assets().getAnimation(animationName), true);
+						p->addComponent<CTransform>(Vec2(0, 0));
+						p->getComponent<CTransform>().scale = m_gridSize / m_game->assets().getAnimation(animationName).getSize();
+						p->addComponent<CBoundingBox>(m_gridSize);
+						gridToMidPixel(w, h, p);
+					}
+				}
+				else
+				{
+					for (int w = x; w <= width; w++)
+					{
+						EnumAnimation animationName = AniDefault;
+						if (w == width)
+						{
+							// ani 2
+							animationName = AniPipe2;
+						}
+						else
+						{
+							// ani 1
+							animationName = AniPipe1;
+						}
+						auto p = m_entityManager.addEntity(Tile);
+						p->addComponent<CAnimation>(m_game->assets().getAnimation(animationName), true);
+						p->addComponent<CTransform>(Vec2(0, 0));
+						p->getComponent<CTransform>().scale = m_gridSize / m_game->assets().getAnimation(animationName).getSize();
+						p->addComponent<CBoundingBox>(m_gridSize);
+						gridToMidPixel(w, h, p);
+					}
+				}
+			}
+		}
+
+		if (temp == "Pole")
+		{
+			fin >> temp;
+			int height = utl::extractValue(temp, "=");
+
+			fin >> temp;
+			int x = utl::extractValue(temp, "=");
+
+			fin >> temp;
+			int y = utl::extractValue(temp, "=");
+
+			for (int h = y; h <= height; h++)
+			{
+				EnumAnimation animationName = AniDefault;
+				if (h == y)
+				{
+					animationName = AniBlock;
+				}
+				else if (h == height)
+				{
+					animationName = AniPeak;
+				}
+				else 
+				{
+					animationName = AniPole;
+				}
+
+				auto p = m_entityManager.addEntity(Tile);
+				p->addComponent<CAnimation>(m_game->assets().getAnimation(animationName), true);
+				p->addComponent<CTransform>(Vec2(0, 0));
+				p->getComponent<CTransform>().scale = m_gridSize / m_game->assets().getAnimation(animationName).getSize();
+				p->addComponent<CBoundingBox>(m_gridSize);
+				gridToMidPixel(x, h, p);
+			}
+		}
 	}
 
 	// spawn player when level has been loaded
@@ -171,10 +284,11 @@ void Scene_Play::update()
 
 void Scene_Play::onEnd()
 {
+	// change to default view
+	m_game->window().setView(m_game->window().getDefaultView());
+
 	// change scene to scene menu when end
 	m_game->changeScene(MenuScene, std::make_shared<Scene_Menu>(m_game), true);
-
-	m_game->window().setView(m_game->window().getDefaultView());
 }
 
 void Scene_Play::sDoAction(const Action& action)
@@ -244,6 +358,9 @@ void Scene_Play::sCollision()
 	// collision system
 	for (auto& e : m_entityManager.getEntities(Tile))
 	{
+		// grap animation name for checking
+		EnumAnimation animatioName = e->getComponent<CAnimation>().animation.getName();
+
 		// collision to player
 		if (e->hasComponent<CBoundingBox>() && e->hasComponent<CTransform>())
 		{
@@ -255,6 +372,12 @@ void Scene_Play::sCollision()
 
 			if (absDiff.y < sumHalf.y && absDiff.x < sumHalf.x)
 			{
+				if (animatioName == AniPole || animatioName == AniPeak)
+				{
+					gridToMidPixel(0, 3, m_player);
+					break;
+				}
+				
 				Vec2 prevSumHalf = m_player->getComponent<CBoundingBox>().halfSize + e->getComponent<CBoundingBox>().halfSize;
 				Vec2 prevDiff = m_player->getComponent<CTransform>().prevPos - e->getComponent<CTransform>().prevPos;
 				Vec2 absPrevDiff = Vec2(abs(prevDiff.x), abs(prevDiff.y));
@@ -278,7 +401,7 @@ void Scene_Play::sCollision()
 					// when player collide from below
 					else
 					{
-						if (e->getComponent<CAnimation>().animation.getName() == AniBlockCoin)
+						if (animatioName == AniBlockCoin)
 						{
 							e->addComponent<CAnimation>(m_game->assets().getAnimation(AniUsedBlockCoin), true);
 
@@ -289,21 +412,19 @@ void Scene_Play::sCollision()
 							coin->addComponent<CLifespan>(30);
 						}
 
-						if (e->getComponent<CAnimation>().animation.getName() == AniBrick)
+						if (animatioName == AniBrick || animatioName == AniBrickIns)
 						{
 							e->addComponent<CAnimation>(m_game->assets().getAnimation(AniExplosion), false);
 							e->removeComponent<CBoundingBox>();
 
-							m_player->getComponent<CTransform>().pos.y += 16;
-							m_player->getComponent<CTransform>().velocity.y += 16;
+							m_player->getComponent<CTransform>().velocity.y = 0;
 						}
 
 						m_player->getComponent<CTransform>().pos.y += ol.y;
 						m_player->getComponent<CTransform>().velocity.y += ol.y;
 					}
-				}
-
-				if (absPrevDiff.y < prevSumHalf.y)
+				} 
+				else if (absPrevDiff.y < prevSumHalf.y)
 				{
 					// when player collide from left
 					if (prevDiff.x < 0)
@@ -339,7 +460,7 @@ void Scene_Play::sCollision()
 					if (absDiff.x < sumHalf.x && absDiff.y < sumHalf.y)
 					{
 						// if bullet is getting brick entity
-						if (e->getComponent<CAnimation>().animation.getName() == AniBrick)
+						if (animatioName == AniBrick || animatioName == AniBrickIns)
 						{
 							e->addComponent<CAnimation>(m_game->assets().getAnimation(AniExplosion), false);
 							e->removeComponent<CBoundingBox>();
@@ -353,6 +474,12 @@ void Scene_Play::sCollision()
 				}
 			}
 		}
+	}
+
+	// if player fall, go back to start
+	if (m_player->getComponent<CTransform>().pos.y > height() - m_player->getComponent<CBoundingBox>().halfSize.y)
+	{
+		gridToMidPixel(0, 3, m_player);
 	}
 }
 
@@ -372,35 +499,37 @@ void Scene_Play::sAnimation()
 		}
 	}
 
+	EnumAnimation animationName = m_player->getComponent<CAnimation>().animation.getName();
+
 	switch (m_player->getComponent<CState>().state)
 	{
 	case onAir: 
-		if (m_player->getComponent<CAnimation>().animation.getName() != AniJump)
+		if (animationName != AniJump)
 			m_player->addComponent<CAnimation>(m_game->assets().getAnimation(AniJump), true);
 		break;
 
 	case onGround:
-		if (m_player->getComponent<CAnimation>().animation.getName() != AniStand)
+		if (animationName != AniStand)
 			m_player->addComponent<CAnimation>(m_game->assets().getAnimation(AniStand), true);
 		break;
 
 	case onWalk:
-		if (m_player->getComponent<CAnimation>().animation.getName() != AniWalk)
+		if (animationName != AniWalk)
 			m_player->addComponent<CAnimation>(m_game->assets().getAnimation(AniWalk), true);
 		break;
 
 	case onShoot:
-		if (m_player->getComponent<CAnimation>().animation.getName() != AniShoot)
+		if (animationName != AniShoot)
 			m_player->addComponent<CAnimation>(m_game->assets().getAnimation(AniShoot), true);
 		break;
 
 	case onShootAir:
-		if (m_player->getComponent<CAnimation>().animation.getName() != AniShootAir)
+		if (animationName != AniShootAir)
 			m_player->addComponent<CAnimation>(m_game->assets().getAnimation(AniShootAir), true);
 		break;
 
 	case onShootWalk:
-		if (m_player->getComponent<CAnimation>().animation.getName() != AniShootWalk)
+		if (animationName != AniShootWalk)
 			m_player->addComponent<CAnimation>(m_game->assets().getAnimation(AniShootWalk), true);
 		break;
 

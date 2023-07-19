@@ -1,11 +1,56 @@
 Entity		Name		FromX	FromY	toX		toY
 Tile		Ground		0		0		20		0
 Tile		Brick		2		3		10		3
-Tile		Brick		5		9		7		9
 Tile		Brick		3		6		3		6
 Tile		Brick		5		6		5		6
 Tile		Brick		7		6		7		6
 Tile		Brick		9		6		9		6
+Tile		Brick		20		7		20		7
+Tile		BrickIns	20		4		20		6
+Tile		Brick		30		3		35		3
+Tile		Brick		38		6		42		6
+Tile		Brick		38		6		42		6
+Tile		Brick		13		7		17		7
+Tile		Brick		31		6		31		6		
+Tile		Brick		34		6		34		6		
+Tile		Brick		46		3		46		3		
+Tile		Brick		48		3		50		3		
+Tile		Brick		62		5		64		5
+Tile		Brick		62		5		64		5
+Tile		Brick		78		4		80		4
+Tile		Brick		83		8		83		8
+Tile		BrickIns	83		6		83		7
+Tile		BlockCoin	81		4		81		4
+Tile		BlockCoin	66		7		66		7
+Tile		BlockCoin	69		8		69		8
 Tile		BlockCoin	4		6		4		6
 Tile		BlockCoin	8		6		8		6
-Tile		Ground		23		0		29		0
+Tile		BlockCoin	30		3		30		3
+Tile		BlockCoin	32		6		33		6
+Tile		BlockCoin	54		3		54		3
+Tile		BlockCoin	57		3		57		3
+Tile		BlockCoin	60		3		60		3
+Tile		BlockCoin	57		6		57		6
+Tile		Ground		23		0		40		0
+Tile		Block		20		1		20		3
+Tile		Block		25		1		27		1
+Tile		Block		26		2		27		2
+Tile		Block		27		3		27		3
+Tile		Block		64		1		68		1
+Tile		Block		65		2		68		2
+Tile		Block		66		3		68		3
+Tile		Block		67		4		68		4
+Tile		Block		68		5		68		5
+Tile		Block		71		1		75		1
+Tile		Block		71		2		74		2
+Tile		Block		71		3		73		3
+Tile		Block		71		4		72		4
+Tile		Block		71		5		71		5
+Tile		Block		83		1		83		5
+Tile		Ground		44		0		68		0
+Tile		Ground		71		0		100		0
+
+Building
+Pipe		height=3		gridX=14		gridY=1
+Pipe		height=4		gridX=37		gridY=1
+Pole		height=9		gridX=90		gridY=1

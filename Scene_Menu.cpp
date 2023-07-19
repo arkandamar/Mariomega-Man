@@ -21,7 +21,7 @@ void Scene_Menu::init()
 {
 	std::string baseName = "level";
 	std::string extension = ".txt";
-	int numFiles = 3; // Number of files to read
+	int numFiles = m_game->getLevelCount(); // Number of files to read
 
 	for (int i = 1; i <= numFiles; i++) {
 		std::string fileName = baseName + std::to_string(i) + extension;

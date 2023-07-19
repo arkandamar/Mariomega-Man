@@ -14,6 +14,7 @@ static std::map<std::string, EnumFont> const fontTable =
 { 
 	{"Mario", EnumFont::FontMario}, {"Megaman", EnumFont::FontMegaman}, { "Roboto", EnumFont::FontRoboto }
 };
+
 static std::map<std::string, EnumTexture> const textureTable =
 {
 	{"TexBlock", EnumTexture::TexBlock}, {"TexCloud", EnumTexture::TextCloud}, {"TexBlockCoin", EnumTexture::TexBlockCoin},
@@ -25,10 +26,11 @@ static std::map<std::string, EnumAnimation> const animTable =
 {
 	{"AniGround", EnumAnimation::AniGround}, {"AniBrick", EnumAnimation::AniBrick},
 	{"AniBlockCoin", EnumAnimation::AniBlockCoin}, {"AniStand", EnumAnimation::AniStand},
-	{"AniWalk", EnumAnimation::AniWalk}, {"AniJump", EnumAnimation::AniJump},
+	{"AniWalk", EnumAnimation::AniWalk}, {"AniJump", EnumAnimation::AniJump}, {"AniBlock", EnumAnimation::AniBlock},
 	{"AniShoot", EnumAnimation::AniShoot}, {"AniShootWalk", EnumAnimation::AniShootWalk},
 	{"AniShootAir", EnumAnimation::AniShootAir}, {"AniBullet", EnumAnimation::AniBullet},
 	{"AniExplosion", EnumAnimation::AniExplosion}, {"AniCoinArise", EnumAnimation::AniCoinArise},
+	{"AniBrickIns", EnumAnimation::AniBrickIns}
 };
 
 GameEngine::GameEngine(const std::string& path)
@@ -45,6 +47,13 @@ void GameEngine::init(const std::string& path)
 	{
 		// read init config.txt
 		fin >> temp;
+		if (temp == "Level")
+		{
+			fin >> temp;
+			int levelCount = utils::extractValue(temp, "=");
+			m_levelCount = levelCount;
+		}
+
 		if (temp == "Window")
 		{
 			fin >> temp;
@@ -159,12 +168,30 @@ void GameEngine::init(const std::string& path)
 	m_assets.getAnimation(AniBullet).setIntRect(0, 0, 24, 24);
 	m_assets.getAnimation(AniExplosion).setIntRect(0, 0, 16, 16);
 	m_assets.getAnimation(AniCoinArise).setIntRect(0, 0, 8, 16);
+	m_assets.getAnimation(AniBlock).setIntRect(0, 17);
+	m_assets.getAnimation(AniBrickIns).setIntRect(34, 0);
 
 	// register dead animation seperately
 	m_assets.registerAnimation(AniSplash, TexMegamanShoot, 1, 5, Vec2(24, 24));
 	m_assets.getAnimation(AniSplash).setIntRect(144, 0);
 	m_assets.registerAnimation(AniUsedBlockCoin, TexBlockCoin, 1, 0, Vec2(16, 16));
 	m_assets.getAnimation(AniUsedBlockCoin).setIntRect(48, 0);
+
+	// pipe entity
+	m_assets.registerAnimation(AniPipe1, TexPipeScenery, 1, 0, Vec2(16, 16));
+	m_assets.getAnimation(AniPipe1).setIntRect(119, 0);
+	m_assets.registerAnimation(AniPipe2, TexPipeScenery, 1, 0, Vec2(16, 16));
+	m_assets.getAnimation(AniPipe2).setIntRect(136, 0);
+	m_assets.registerAnimation(AniPipe3, TexPipeScenery, 1, 0, Vec2(16, 16));
+	m_assets.getAnimation(AniPipe3).setIntRect(119, 17);
+	m_assets.registerAnimation(AniPipe4, TexPipeScenery, 1, 0, Vec2(16, 16));
+	m_assets.getAnimation(AniPipe4).setIntRect(136, 17);
+
+	// pole entity
+	m_assets.registerAnimation(AniPeak, TexPipeScenery, 1, 0, Vec2(16, 16));
+	m_assets.getAnimation(AniPeak).setIntRect(136, 34);
+	m_assets.registerAnimation(AniPole, TexPipeScenery, 1, 0, Vec2(16, 16));
+	m_assets.getAnimation(AniPole).setIntRect(136, 51);
 }
 
 void GameEngine::run()
@@ -216,6 +243,11 @@ void GameEngine::changeScene(EnumScene sceneName, std::shared_ptr<Scene> scene, 
 	m_sceneArr[sceneName] = scene;
 
 	if (endCurrentScene) m_currentScene = sceneName;
+}
+
+int const GameEngine::getLevelCount() const
+{
+	return m_levelCount;
 }
 
 void GameEngine::quit()

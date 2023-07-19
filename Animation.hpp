@@ -5,7 +5,8 @@
 #include <SFML/Graphics.hpp>
 
 enum EnumAnimation { AniDefault = -1, AniWalk, AniBlockCoin, AniUsedBlockCoin,
-	AniSplash, AniExplosion, AniBullet, AniShootAir, AniGround, AniCoinArise,
+	AniSplash, AniExplosion, AniBullet, AniShootAir, AniGround, AniCoinArise, AniBlock,
+	AniBrickIns, AniPipe1, AniPipe2, AniPipe3, AniPipe4, AniPeak, AniPole,
 	AniShoot, AniShootWalk, AniJump, AniBrick, AniStand, ANI_COUNT = AniStand + 1 };
 
 class Animation

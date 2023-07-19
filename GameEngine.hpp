@@ -15,6 +15,7 @@ protected:
 	EnumScene m_currentScene;
 	SceneArr m_sceneArr;
 	size_t m_simulationSpeed = 1;
+	int m_levelCount = 1;
 	bool m_running = true;
 
 	void init(const std::string& path);
@@ -34,6 +35,8 @@ public:
 
 	sf::RenderWindow& window();
 	Assets& assets();
+
+	int const getLevelCount() const;
 	const Assets& assets() const;
 	bool isRunning();
 };
